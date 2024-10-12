@@ -1,12 +1,9 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:final_project
+    url: jdbc:mysql://localhost:3306/project_final
     username: user
-    password:
-    driver-class-name: org.h2.Driver
-  h2:
-    console:
-      enabled: true
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
