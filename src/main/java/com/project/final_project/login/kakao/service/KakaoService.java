@@ -1,9 +1,12 @@
 package com.project.final_project.login.kakao.service;
 
+import com.project.final_project.login.kakao.domain.KakaoLoginLog;
 import com.project.final_project.login.kakao.dto.KakaoDTO;
+import com.project.final_project.login.kakao.repository.KakaoLoginLogRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +33,13 @@ public class KakaoService {
   private final static String KAKAO_AUTH_URI = "https://kauth.kakao.com";
   private final static String KAKAO_API_URI = "https://kapi.kakao.com";
 
+  private final KakaoLoginLogRepository kakaoLoginLogRepository;
+
+  @Autowired
+  public KakaoService(KakaoLoginLogRepository kakaoLoginLogRepository) {
+    this.kakaoLoginLogRepository = kakaoLoginLogRepository;
+  }
+
   public String getKakaoLogin() {
     return KAKAO_AUTH_URI + "/oauth/authorize"
         + "?client_id=" + KAKAO_CLIENT_ID
@@ -37,7 +47,7 @@ public class KakaoService {
         + "&response_type=code";
   }
 
-  public KakaoDTO getKakaoInfo(String code) throws Exception {
+  public KakaoDTO getKakaoInfo(String code, String state) throws Exception {
     if (code == null) throw new Exception("Failed get authorization code, need code");
 
     String accessToken = "";
@@ -72,15 +82,18 @@ public class KakaoService {
 
       accessToken  = (String) jsonObj.get("access_token");
       refreshToken = (String) jsonObj.get("refresh_token");
+
+      addKakaoLoginLog(state, accessToken);
+
     } catch (Exception e) {
       throw new Exception("API call failed");
     }
 
-    return getUserInfoWithToken(accessToken);
+    return gettUserInfoWithToken(accessToken, state);
   }
 
   // 액세스 토큰을 정상적으로 발급받았다면 이제 사용자 정보를 가져올 수 있습니다. 이 때 Header에 Bearer 액세스 토큰 을 담아 요청
-  private KakaoDTO getUserInfoWithToken(String accessToken) throws Exception {
+  private KakaoDTO gettUserInfoWithToken(String accessToken, String state) throws Exception {
     //HttpHeader 생성
     HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "Bearer " + accessToken);
@@ -112,6 +125,15 @@ public class KakaoService {
         .id(id)
         .email(email)
         .nickname(nickname).build();
+  }
+
+  public void addKakaoLoginLog(String state, String accessToken) {
+
+    KakaoLoginLog kakaoLoginLog = new KakaoLoginLog();
+    kakaoLoginLog.setState(state);
+    kakaoLoginLog.setAccessToken(accessToken);
+
+    kakaoLoginLogRepository.save(kakaoLoginLog);
   }
 
   // 로그아웃 API
