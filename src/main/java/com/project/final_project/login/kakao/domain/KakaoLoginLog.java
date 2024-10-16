@@ -15,7 +15,7 @@ public class KakaoLoginLog {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  Long id;
+  Integer id;
 
   @Column(name = "state")
   String state;
