@@ -32,6 +32,16 @@ dependencies {
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    // 스프링 데이터 Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Redis를 활용하기 위한 클라이언트 (Lettuce 또는 Jedis)
+//    implementation 'io.lettuce.core:lettuce-core:6.2.6'
+
+    // Springdoc OpenAPI 3 의존성 추가
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     annotationProcessor 'org.projectlombok:lombok'
