@@ -1,14 +1,9 @@
 package com.project.final_project.chatlog.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.final_project.chatlog.domain.ChatLog;
-import com.project.final_project.chatlog.dto.RequestChatLogDTO;
-import com.project.final_project.chatlog.dto.ResponseChatLogDTO;
+import com.project.final_project.chatlog.dto.ChatLogRequestDTO;
+import com.project.final_project.chatlog.dto.ChatLogResponseDTO;
 import com.project.final_project.chatlog.repository.ChatLogRepository;
-import jakarta.annotation.PostConstruct;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -20,25 +15,25 @@ public class ChatLogService {
 
   private final ChatLogRepository chatLogRepository;
 
-  public RequestChatLogDTO saveChatLog(RequestChatLogDTO requestChatLogDTO) {
+  public ChatLogRequestDTO saveChatLog(ChatLogRequestDTO chatLogRequestDTO) {
     ChatLog chatLog = ChatLog.builder()
-        .sender_id(requestChatLogDTO.getSenderId())
-        .receiver_id(requestChatLogDTO.getReceiverId())
-        .message(requestChatLogDTO.getMessage())
-        .channel(requestChatLogDTO.getChannel())
-        .timestamp(requestChatLogDTO.getTimestamp())
-        .chatType(requestChatLogDTO.getChatType())
+        .senderId(chatLogRequestDTO.getSenderId())
+        .receiverId(chatLogRequestDTO.getReceiverId())
+        .message(chatLogRequestDTO.getMessage())
+        .channel(chatLogRequestDTO.getChannel())
+        .timestamp(chatLogRequestDTO.getTimestamp())
+        .chatType(chatLogRequestDTO.getChatType())
         .build();
     chatLogRepository.save(chatLog);
-    return requestChatLogDTO;
+    return chatLogRequestDTO;
   }
 
-  public List<ResponseChatLogDTO> getChatLogsBySenderId(Integer senderId) {
+  public List<ChatLogResponseDTO> getChatLogsBySenderId(Integer senderId) {
     List<ChatLog> list = chatLogRepository.getChatLogsBySenderId(senderId);
-    List<ResponseChatLogDTO> result = list.stream()
-        .map(c -> ResponseChatLogDTO.builder().
-            senderId(c.getSender_id())
-            .receiverId(c.getReceiver_id())
+    List<ChatLogResponseDTO> result = list.stream()
+        .map(c -> ChatLogResponseDTO.builder().
+            senderId(c.getSenderId())
+            .receiverId(c.getReceiverId())
             .message(c.getMessage())
             .channel(c.getChannel())
             .timestamp(c.getTimestamp())
@@ -47,5 +42,24 @@ public class ChatLogService {
         )
         .collect(Collectors.toList());
     return result;
+  }
+
+  // 채팅 로그가 이미 있는지 확인하는 메서드
+  public boolean existsChatLogs() {
+    return chatLogRepository.count() > 0;  // 데이터가 있으면 true 반환
+  }
+
+  public List<ChatLogResponseDTO> getAllChatLogs() {
+    List<ChatLog> allChatLogs = chatLogRepository.findAll();
+    return allChatLogs.stream()
+        .map(c -> new ChatLogResponseDTO(
+            c.getSenderId(),
+            c.getReceiverId(),
+            c.getMessage(),
+            c.getTimestamp(),
+            c.getChannel(),
+            c.getChatType())
+        )
+        .toList();
   }
 }

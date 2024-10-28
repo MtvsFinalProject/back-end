@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ChatLogRepository extends JpaRepository<ChatLog, String> {
 
-  @Query("select c from ChatLog c where c.sender_id = :senderId")
+  @Query("select c from ChatLog c where c.senderId = :senderId")
   List<ChatLog> getChatLogsBySenderId(@Param("senderId") Integer senderId);
 
 }
