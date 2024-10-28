@@ -17,6 +17,7 @@ import org.springframework.data.redis.core.RedisHash;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 //@RedisHash(value = "chatlog", timeToLive = 300)
 public class ChatLog {
 
@@ -24,10 +25,23 @@ public class ChatLog {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  private Integer sender_id;
-  private Integer receiver_id;
+  private Integer senderId;
+  private Integer receiverId;
   private String message;
   private String timestamp;
   private String channel;
   private ChatType chatType;
+
+  @Override
+  public String toString() {
+    return "ChatLog{" +
+        "id=" + id +
+        ", senderId=" + senderId +
+        ", receiverId=" + receiverId +
+        ", message='" + message + '\'' +
+        ", timestamp='" + timestamp + '\'' +
+        ", channel='" + channel + '\'' +
+        ", chatType=" + chatType +
+        '}';
+  }
 }
