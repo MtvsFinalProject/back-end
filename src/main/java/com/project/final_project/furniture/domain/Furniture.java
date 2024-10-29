@@ -1,9 +1,12 @@
-package com.project.final_project.furniture.groundfurniture.domain;
+package com.project.final_project.furniture.domain;
+import com.project.final_project.myclassroom.domain.MyClassroom;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,13 +16,13 @@ import lombok.Setter;
 
 
 @Entity
-@Table(name = "ground_furniture")
+@Table(name = "furniture")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroundFurniture{
+public class Furniture {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,4 +45,8 @@ public class GroundFurniture{
 
   @Column(name = "map_id")
   private Integer mapId;
+
+  @ManyToOne
+  @JoinColumn(name = "my_classroom_id") // 외래 키 컬럼 명 설정
+  private MyClassroom myClassroom;
 }

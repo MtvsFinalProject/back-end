@@ -61,9 +61,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-batch'
 
     // MySQL Connector
-    implementation 'mysql:mysql-connector-java:8.0.28'
+//    implementation 'mysql:mysql-connector-java:8.0.28'
+    runtimeOnly 'mysql:mysql-connector-java:8.0.32'
 
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
     // Test Dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

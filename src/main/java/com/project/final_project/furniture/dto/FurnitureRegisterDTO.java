@@ -1,6 +1,5 @@
-package com.project.final_project.furniture.groundfurniture.dto;
+package com.project.final_project.furniture.dto;
 
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroundFurnitureRegisterDTO {
+public class FurnitureRegisterDTO {
   private Integer objId;
   private Integer x;
   private Integer y;

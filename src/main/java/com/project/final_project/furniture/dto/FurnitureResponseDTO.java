@@ -1,11 +1,11 @@
-package com.project.final_project.furniture.groundfurniture.dto;
+package com.project.final_project.furniture.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class GroundFurnitureUpdateDTO {
+public class FurnitureResponseDTO {
   private Integer id;
   private Integer objId;
   private Integer x;
