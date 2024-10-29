@@ -1,11 +1,8 @@
 package com.project.final_project.user.domain;
 
 import com.project.final_project.school.domain.School;
-import com.project.final_project.user.dto.UserRegisterDTO;
-import com.project.final_project.user.dto.UserUpdateDTO;
-import jakarta.persistence.CollectionTable;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -13,20 +10,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.util.Date;
-import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@NoArgsConstructor
+
 @Entity
 @Table(name = "user")
-@Builder
+@Setter
 @Getter
-@AllArgsConstructor
+@NoArgsConstructor
 public class User {
+
   @Id
   @GeneratedValue
   Integer id;
@@ -74,56 +70,6 @@ public class User {
   @JoinColumn(name = "school_id")
   School school;
 
-  //==생성 메소드==//
-  public static User createUser(UserRegisterDTO dto){
-       return User.builder()
-        .socialId(dto.getSocialId())
-        .name(dto.getName())
-        .age(dto.getAge())
-        .grade(dto.getGrade())
-//        .preferences(dto.getPreferences())
-        .birthday(dto.getBirthday())
-        .gender(dto.getGender())
-        .email(dto.getEmail())
-        .password(dto.getPassword())
-        .nickname(dto.getNickname())
-        .phone(dto.getPhone())
-        .level(1)
-        .exp(0)
-        .maxExp(100)
-        .build();
-  }
-
-  //==수정 메소드==//
-  public User updateUser(UserUpdateDTO dto) {
-    if (dto.getName() != null) {
-      this.name = dto.getName();
-    }
-    if (dto.getAge() != null) {
-      this.age = dto.getAge();
-    }
-    if (dto.getGrade() != null) {
-      this.grade = dto.getGrade();
-    }
-    if (dto.getBirthday() != null) {
-      this.birthday = dto.getBirthday();
-    }
-    if (dto.getGender() != null) {
-      this.gender = dto.getGender();
-    }
-    if (dto.getNickname() != null) {
-      this.nickname = dto.getNickname();
-    }
-    if (dto.getPhone() != null) {
-      this.phone = dto.getPhone();
-    }
-//    if (dto.getPreferences() != null) {
-//      this.preferences = dto.getPreferences();
-//    }
-    return this;
-  }
-
-
   //==비즈니스 로직==//
   public void gainExp(Integer exp) {
     this.exp += exp;
@@ -150,7 +96,6 @@ public class User {
         ", name='" + name + '\'' +
         ", age=" + age +
         ", grade=" + grade +
-//        ", preferences=" + preferences +
         ", birthday='" + birthday + '\'' +
         ", gender='" + gender + '\'' +
         ", email='" + email + '\'' +
