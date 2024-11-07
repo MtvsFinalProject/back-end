@@ -1,7 +1,10 @@
 package com.project.final_project.furniture.controller;
 
+import static com.project.final_project.common.global.HttpResponseEntity.success;
+
+import com.project.final_project.common.global.HttpResponseEntity.ResponseResult;
 import com.project.final_project.furniture.dto.FurnitureRegisterDTO;
-import com.project.final_project.furniture.dto.FurnitureResponseDTO;
+import com.project.final_project.furniture.dto.FurnitureDTO;
 import com.project.final_project.furniture.dto.FurnitureUpdateDTO;
 import com.project.final_project.furniture.service.FurnitureService;
 import java.util.List;
@@ -10,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,31 +27,34 @@ public class FurnitureController {
 
   private final FurnitureService furnitureService;
 
+  @GetMapping("/list")
+  public ResponseResult<List<FurnitureDTO>> getAllFurniture() {
+    return success(furnitureService.getAllFurniture());
+  }
+
+  @GetMapping("/list/map/{mapId}/{mapType}")
+  public ResponseResult<List<FurnitureDTO>> getFurnitureListByMapIdAndMapType(
+      @PathVariable("mapId") Integer mapId, @PathVariable("mapType") String mapType) {
+    return success(furnitureService.getFurnitureListByMapIdAndMapType(mapId, mapType));
+  }
+
+  @GetMapping
+  public ResponseResult<FurnitureDTO> getFurnitureById(@RequestParam("furnitureId") Integer id) {
+    return success(furnitureService.getFurnitureById(id));
+  }
+
   @PostMapping
-  public ResponseEntity<Integer> registerGroundFurniture(
-      @RequestBody FurnitureRegisterDTO furnitureRegisterDTO) {
-    return ResponseEntity.ok(furnitureService.registerGroundFurniture(furnitureRegisterDTO));
+  public ResponseEntity<Integer> registerFurniture(@RequestBody FurnitureRegisterDTO furnitureRegisterDTO) {
+    return ResponseEntity.ok(furnitureService.registerFurniture(furnitureRegisterDTO));
    }
 
-  @GetMapping("/user")
-  public ResponseEntity<List<FurnitureResponseDTO>> getGroundFurnitureByUserId(@RequestParam("userId") String userId) {
-    return ResponseEntity.ok(furnitureService.getGroundFurnitureByUserId(userId));
-  }
-
-  @GetMapping("/map")
-  public ResponseEntity<List<FurnitureResponseDTO>> getGroundFurnitureByMapId(@RequestParam("mapId") String mapId) {
-    return ResponseEntity.ok(furnitureService.getGroundFurnitureByMapId(mapId));
-  }
-
   @PatchMapping
-  public ResponseEntity<FurnitureUpdateDTO> updateGroundFurniture(@RequestBody
-  FurnitureUpdateDTO furnitureUpdateDTO) {
-    return ResponseEntity.ok(furnitureService.updateGroundFurnitureUpdateDTO(
-        furnitureUpdateDTO));
+  public ResponseEntity<FurnitureUpdateDTO> updateFurniture(@RequestBody FurnitureUpdateDTO furnitureUpdateDTO) {
+    return ResponseEntity.ok(furnitureService.updateFurniture(furnitureUpdateDTO));
   }
 
   @DeleteMapping
-  public ResponseEntity<?> removeGroundFurniture(@RequestParam("furnitureId") Integer furnitureId) {
+  public ResponseEntity<?> removeFurniture(@RequestParam("furnitureId") Integer furnitureId) {
     furnitureService.deleteFurniture(furnitureId);
     return ResponseEntity.noContent().build();
   }

@@ -11,6 +11,7 @@ public class FurnitureUpdateDTO {
   private Integer x;
   private Integer y;
   private Integer rot;
-  private Integer userId;
+  private Boolean flip;
   private Integer mapId;
+  private String mapType;
 }
