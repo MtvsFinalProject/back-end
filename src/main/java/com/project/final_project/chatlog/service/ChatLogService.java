@@ -16,7 +16,7 @@ public class ChatLogService {
 
   private final ChatLogRepository chatLogRepository;
 
-  public ChatLogRequestDTO saveChatLog(ChatLogRequestDTO chatLogRequestDTO) {
+  public ChatLogResponseDTO saveChatLog(ChatLogRequestDTO chatLogRequestDTO) {
     ChatLog chatLog = ChatLog.builder()
         .senderId(chatLogRequestDTO.getSenderId())
         .receiverId(chatLogRequestDTO.getReceiverId())
@@ -26,12 +26,12 @@ public class ChatLogService {
         .chatType(chatLogRequestDTO.getChatType())
         .build();
     chatLogRepository.save(chatLog);
-    return chatLogRequestDTO;
+    return new ChatLogResponseDTO(chatLog);
   }
 
   public List<ChatLogResponseDTO> getChatLogsBySenderId(Integer senderId) {
     List<ChatLog> list = chatLogRepository.getChatLogsBySenderId(senderId);
-    List<ChatLogResponseDTO> result = list.stream()
+    return list.stream()
         .map(c -> ChatLogResponseDTO.builder().
             senderId(c.getSenderId())
             .receiverId(c.getReceiverId())
@@ -42,7 +42,6 @@ public class ChatLogService {
             .build()
         )
         .collect(Collectors.toList());
-    return result;
   }
 
   // 채팅 로그가 이미 있는지 확인하는 메서드

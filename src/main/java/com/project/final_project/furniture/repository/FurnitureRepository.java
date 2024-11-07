@@ -9,9 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FurnitureRepository extends JpaRepository<Furniture, Integer> {
-  @Query("select g from Furniture g where g.userId = :userId")
-  List<Furniture> getGroundFurnitureByUserId(@Param("userId") String userId);
 
-  @Query("select g from Furniture g where g.mapId = :mapId")
-  List<Furniture> getGroundFurnitureByMapId(@Param("mapId") String mapId);
+  @Query("select f from Furniture f where f.mapId = :mapId and f.mapType = :mapType ")
+  List<Furniture> getFurnitureListByMapIdAndMapType(@Param("mapId") Integer mapId, @Param("mapType") String mapType);
 }

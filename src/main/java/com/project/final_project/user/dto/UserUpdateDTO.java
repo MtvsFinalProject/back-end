@@ -1,27 +1,28 @@
 package com.project.final_project.user.dto;
 
-import java.util.Date;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserUpdateDTO {
-
-  Integer userId;
+  Integer id;
   String socialId;
   String name;
-  Integer age;
   Integer grade;
   String birthday;
-  String gender;
+  Boolean gender;
   String email;
   String password;
-  String nickname;
   String phone;
+  List<String> interest;
+  String statusMesasge;
   Integer schoolId;
 }

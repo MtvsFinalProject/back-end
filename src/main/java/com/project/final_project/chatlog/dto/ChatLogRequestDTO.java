@@ -13,9 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChatLogRequestDTO {
 
-  @JsonProperty("senderId")
   private Integer senderId;
-
   private Integer receiverId;
   private String message;
   private String timestamp;

@@ -1,14 +1,15 @@
 package com.project.final_project.comment.service;
 
-import com.project.final_project.board.domain.Board;
-import com.project.final_project.board.repository.BoardRepository;
 import com.project.final_project.comment.domain.Comment;
 import com.project.final_project.comment.dto.CommentRequestDTO;
+import com.project.final_project.comment.dto.CommentResponseDTO;
 import com.project.final_project.comment.mapper.CommentRequestMapper;
 import com.project.final_project.comment.repository.CommentRepository;
 import com.project.final_project.common.exception.NotFoundException;
 import com.project.final_project.user.domain.User;
 import com.project.final_project.user.repository.UserRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,32 +20,44 @@ public class CommentService {
 
   private CommentRepository commentRepository;
   private final UserRepository userRepository;
-  private final BoardRepository boardRepository;
   private final CommentRequestMapper commentRequestMapper;
 
-  public Comment insertComment(Integer boardId, CommentRequestDTO commentRequestDTO) {
+  public Comment insertComment(CommentRequestDTO commentRequestDTO) {
 
     User user = userRepository.findById(commentRequestDTO.getUserId())
         .orElseThrow(() -> new NotFoundException("User not found id : " + commentRequestDTO.getUserId()));
 
-    Board board = boardRepository.findById(boardId)
-        .orElseThrow(() -> new NotFoundException("User not found id : " + boardId));
+    Comment comment = new Comment(
+        commentRequestDTO.getContent(),
+        commentRequestDTO.getBoardType(),
+        commentRequestDTO.getBoardId()
+    );
 
-    Comment comment = commentRequestMapper.toEntity(commentRequestDTO);
-
-    Comment parentComment;
     if(commentRequestDTO.getParentCommentId() != null) {
-      parentComment = commentRepository.findById(commentRequestDTO.getParentCommentId())
-          .orElseThrow(() -> new NotFoundException("parentComment not found id : " + commentRequestDTO.getParentCommentId()));
-
+      Comment parentComment = commentRepository.findById(commentRequestDTO.getParentCommentId())
+          .orElseThrow(() -> new NotFoundException("Parent comment not found id : " + commentRequestDTO.getParentCommentId()));
       comment.updateParent(parentComment);
     }
 
     comment.updateWriter(user);
-    comment.updateBoard(board);
-
     return commentRepository.save(comment);
+
   }
+
+  /**
+   * 특정 게시판 타입과 ID에 해당하는 댓글을 조회합니다.
+   */
+  public List<CommentResponseDTO> findCommentsByBoard(String boardType, Integer boardId) {
+    List<Comment> comments = commentRepository.findByBoardTypeAndBoardId(boardType, boardId);
+
+    // 댓글 리스트를 CommentResponseDTO 형태로 변환하여 반환
+    List<CommentResponseDTO> responseDTOs = comments.stream()
+        .map(CommentResponseDTO::convertCommentToDTO)
+        .collect(Collectors.toList());
+
+    return responseDTOs;
+  }
+
 
   @Transactional
   public void delete(Integer commentId) {

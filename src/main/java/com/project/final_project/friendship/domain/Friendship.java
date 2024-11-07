@@ -1,7 +1,11 @@
 package com.project.final_project.friendship.domain;
 
-import com.project.final_project.user.domain.User;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,31 +18,29 @@ public class Friendship {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "requester_id")
-    private User requester;
+    @Column(name = "requester_id")
+    private Integer requesterId;
 
-    @ManyToOne
-    @JoinColumn(name = "receiver_id")
-    private User receiver;
+    @Column(name = "receiver_id")
+    private Integer receiverId;
 
     private boolean isAccepted;
 
     public Friendship() {}
 
-    public Friendship(User requester, User receiver, boolean isAccepted) {
-        this.requester = requester;
-        this.receiver = receiver;
+    public Friendship(Integer requesterId, Integer receiverId, boolean isAccepted) {
+        this.requesterId = requesterId;
+        this.receiverId = receiverId;
         this.isAccepted = isAccepted;
     }
 
     @Override
     public String toString() {
         return "Friendship{" +
-                "id=" + id +
-                ", requester=" + requester +
-                ", receiver=" + receiver +
-                ", isAccepted=" + isAccepted +
-                '}';
+            "id=" + id +
+            ", requesterId=" + requesterId +
+            ", receiverId=" + receiverId +
+            ", isAccepted=" + isAccepted +
+            '}';
     }
 }

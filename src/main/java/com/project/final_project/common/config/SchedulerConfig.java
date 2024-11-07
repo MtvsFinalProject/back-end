@@ -22,12 +22,12 @@ public class SchedulerConfig {
   private final Job chatLogJob;
   private final UserService userService;
 
-  @Scheduled(fixedDelay = 30000)
+//  @Scheduled(fixedDelay = 15000)
   public void runChatLogJob() {
     List<UserDTO> allUser = userService.getAllUser();  // 모든 유저 조회
 
     for (UserDTO user : allUser) {
-      Long senderId = user.getUserId().longValue();  // 유저별 senderId 가져오기
+      Long senderId = user.getId().longValue();  // 유저별 senderId 가져오기
       System.out.println("senderId = " + senderId);
 
       JobParameters jobParameters = new JobParametersBuilder()

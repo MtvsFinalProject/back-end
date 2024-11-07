@@ -93,25 +93,28 @@ public class BatchConfig {
           recommendation.setRecommendedFriendIds(new ArrayList<>());
         }
 
-        for (AIResponseDTO.RecommendedUser recommendedUser : aiResponse.getRecommended_users()) {
-            uniqueRecommendedIds.add(recommendedUser.getSenderId());
+        if(aiResponse != null) {
+          for (AIResponseDTO.RecommendedUser recommendedUser : aiResponse.getRecommended_users()) {
+              uniqueRecommendedIds.add(recommendedUser.getSenderId());
+          }
+
+          // 기존 추천 친구 목록을 가져옴
+          List<Integer> currentFriendIds = recommendation.getRecommendedFriendIds();
+
+          // 중복되지 않도록 새로운 추천 친구 ID들을 추가
+          currentFriendIds.addAll(uniqueRecommendedIds.stream()
+              .filter(id -> !currentFriendIds.contains(id)
+                  && !aiService.isExistBySenderIdAndFriendId(senderId.intValue(), id))  // 중복된 ID를 제외
+              .toList());
+
+          // 업데이트된 추천 친구 목록을 설정
+          recommendation.setRecommendedFriendIds(currentFriendIds);
+
+          // 업데이트된 recommendation을 저장
+          aiService.saveRecommendation(recommendation);
         }
-
-        // 기존 추천 친구 목록을 가져옴
-        List<Integer> currentFriendIds = recommendation.getRecommendedFriendIds();
-
-        // 중복되지 않도록 새로운 추천 친구 ID들을 추가
-        currentFriendIds.addAll(uniqueRecommendedIds.stream()
-            .filter(id -> !currentFriendIds.contains(id)
-                && !aiService.isExistBySenderIdAndFriendId(senderId.intValue(), id))  // 중복된 ID를 제외
-            .toList());
-
-        // 업데이트된 추천 친구 목록을 설정
-        recommendation.setRecommendedFriendIds(currentFriendIds);
-
-        // 업데이트된 recommendation을 저장
-        aiService.saveRecommendation(recommendation);
       }
+
     };
   }
 

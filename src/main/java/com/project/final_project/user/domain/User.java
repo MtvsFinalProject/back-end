@@ -1,16 +1,20 @@
 package com.project.final_project.user.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.final_project.school.domain.School;
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Builder;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,17 +28,15 @@ import lombok.Setter;
 public class User {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "user_id")
   Integer id;
 
-  @Column(name = "social_id")
+  @Column(name = "user_social_id")
   String socialId; // 소셜 로그인에서 제공한 고유 ID 저장
 
   @Column(name = "user_name")
   String name;
-
-  @Column(name = "user_age")
-  Integer age;
 
   @Column(name = "user_grade")
   Integer grade;
@@ -43,16 +45,13 @@ public class User {
   String birthday;
 
   @Column(name = "user_gender")
-  String gender;
+  Boolean gender;
 
   @Column(name = "user_email")
   String email;
 
   @Column(name = "user_password")
   String password;
-
-  @Column(name = "user_nickname")
-  String nickname;
 
   @Column(name = "user_phone")
   String phone;
@@ -65,6 +64,13 @@ public class User {
 
   @Column(name = "user_max_exp")
   Integer maxExp;
+
+  @Column(name = "user_status_message")
+  String statusMessage;
+
+  @ElementCollection
+  @Column(name = "interest")
+  List<String> interest = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "school_id")
@@ -88,23 +94,24 @@ public class User {
     return 100 + (level - 1) * 50;
   }
 
+
   @Override
   public String toString() {
     return "User{" +
         "id=" + id +
         ", socialId='" + socialId + '\'' +
         ", name='" + name + '\'' +
-        ", age=" + age +
         ", grade=" + grade +
         ", birthday='" + birthday + '\'' +
-        ", gender='" + gender + '\'' +
+        ", gender=" + gender +
         ", email='" + email + '\'' +
         ", password='" + password + '\'' +
-        ", nickname='" + nickname + '\'' +
         ", phone='" + phone + '\'' +
         ", level=" + level +
         ", exp=" + exp +
         ", maxExp=" + maxExp +
+        ", statusMessage='" + statusMessage + '\'' +
+        ", interest=" + interest +
         ", school=" + school +
         '}';
   }

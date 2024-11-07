@@ -2,7 +2,7 @@ package com.project.final_project.furniture.service;
 
 import com.project.final_project.furniture.domain.Furniture;
 import com.project.final_project.furniture.dto.FurnitureRegisterDTO;
-import com.project.final_project.furniture.dto.FurnitureResponseDTO;
+import com.project.final_project.furniture.dto.FurnitureDTO;
 import com.project.final_project.furniture.dto.FurnitureUpdateDTO;
 import com.project.final_project.furniture.repository.FurnitureRepository;
 import java.util.List;
@@ -17,48 +17,61 @@ public class FurnitureService {
 
   private final FurnitureRepository furnitureRepository;
 
-  public Integer registerGroundFurniture(
-      @RequestBody FurnitureRegisterDTO furnitureRegisterDTO) {
+  public List<FurnitureDTO> getAllFurniture() {
+    return furnitureRepository.findAll().stream()
+        .map(f -> new FurnitureDTO(
+            f.getId(),
+            f.getObjId(),
+            f.getX(),
+            f.getY(),
+            f.getRot(),
+            f.getFlip(),
+            f.getMapId(),
+            f.getMapType()
+            ))
+        .toList();
+  }
+
+  public Integer registerFurniture(@RequestBody FurnitureRegisterDTO furnitureRegisterDTO) {
     Furniture newFurniture = Furniture.builder()
         .objId(furnitureRegisterDTO.getObjId())
         .x(furnitureRegisterDTO.getX())
         .y(furnitureRegisterDTO.getY())
         .rot(furnitureRegisterDTO.getRot())
-        .userId(furnitureRegisterDTO.getUserId())
+        .flip(furnitureRegisterDTO.getFlip())
         .mapId(furnitureRegisterDTO.getMapId())
+        .mapType(furnitureRegisterDTO.getMapType())
         .build();
     Furniture savedFurniture = furnitureRepository.save(newFurniture);
     return savedFurniture.getId();
   }
 
-  public List<FurnitureResponseDTO> getGroundFurnitureByUserId(String userId) {
-    List<Furniture> furnitureList = furnitureRepository.getGroundFurnitureByUserId(
-        userId);
-    List<FurnitureResponseDTO> result = furnitureList.stream()
-        .map(g -> new FurnitureResponseDTO(g.getId(), g.getObjId(), g.getX(), g.getY(), g.getRot(), g.getUserId(), g.getMapId()))
-        .toList();
-    return result;
-  }
-
-  public List<FurnitureResponseDTO> getGroundFurnitureByMapId(String mapId) {
-    List<Furniture> furnitureList = furnitureRepository.getGroundFurnitureByMapId(
-        mapId);
-    List<FurnitureResponseDTO> result = furnitureList.stream()
-        .map(g -> new FurnitureResponseDTO(g.getId(), g.getObjId(), g.getX(), g.getY(), g.getRot(), g.getUserId(), g.getMapId()))
-        .toList();
-    return result;
-  }
-
   @Transactional
-  public FurnitureUpdateDTO updateGroundFurnitureUpdateDTO(FurnitureUpdateDTO furnitureUpdateDTO) {
+  public FurnitureUpdateDTO updateFurniture(FurnitureUpdateDTO furnitureUpdateDTO) {
     Integer id = furnitureUpdateDTO.getId();
     Furniture foundFurniture = furnitureRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("not found furniture : " + id));
-    foundFurniture.setObjId(furnitureUpdateDTO.getObjId());
-    foundFurniture.setX(furnitureUpdateDTO.getX());
-    foundFurniture.setY(furnitureUpdateDTO.getY());
-    foundFurniture.setRot(furnitureUpdateDTO.getRot());
-    foundFurniture.setUserId(furnitureUpdateDTO.getUserId());
-    foundFurniture.setMapId(furnitureUpdateDTO.getMapId());
+
+    if(furnitureUpdateDTO.getObjId() != null) {
+      foundFurniture.setObjId(furnitureUpdateDTO.getObjId());
+    }
+    if(furnitureUpdateDTO.getX() != null) {
+      foundFurniture.setX(furnitureUpdateDTO.getX());
+    }
+    if(furnitureUpdateDTO.getY() != null) {
+      foundFurniture.setY(furnitureUpdateDTO.getY());
+    }
+    if(furnitureUpdateDTO.getRot() != null) {
+      foundFurniture.setRot(furnitureUpdateDTO.getRot());
+    }
+    if(furnitureUpdateDTO.getFlip() != null){
+      foundFurniture.setFlip(furnitureUpdateDTO.getFlip());
+    }
+    if(furnitureUpdateDTO.getMapId() != null) {
+      foundFurniture.setMapId(furnitureUpdateDTO.getMapId());
+    }
+    if(furnitureUpdateDTO.getMapType() != null) {
+      foundFurniture.setMapType(furnitureUpdateDTO.getMapType());
+    }
     return furnitureUpdateDTO;
   }
 
@@ -68,5 +81,14 @@ public class FurnitureService {
 
   public boolean existsChatLogs() {
     return furnitureRepository.count() > 0;
+  }
+
+  public FurnitureDTO getFurnitureById(Integer id) {
+    return new FurnitureDTO(furnitureRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("not found furniture id : " + id)));
+  }
+
+  public List<FurnitureDTO> getFurnitureListByMapIdAndMapType(Integer mapId, String mapType) {
+    List<Furniture> furnitureList = furnitureRepository.getFurnitureListByMapIdAndMapType(mapId, mapType);
+    return furnitureList.stream().map(FurnitureDTO::new).toList();
   }
 }

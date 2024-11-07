@@ -11,9 +11,13 @@ public class CommentRequestDTO {
   private Integer userId;
   private Integer parentCommentId;
   private String content;
+  private String boardType;
+  private Integer boardId;
 
-  public CommentRequestDTO(String content) {
+  public CommentRequestDTO(String content, String boardType, Integer boardId) {
     this.content = content;
+    this.boardType = boardType;
+    this.boardId = boardId;
   }
 
 }

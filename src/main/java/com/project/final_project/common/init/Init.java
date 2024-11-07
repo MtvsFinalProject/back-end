@@ -67,7 +67,7 @@ public class Init {
 
         // 데이터베이스에 저장
         for (FurnitureRegisterDTO furniture : furnitureData) {
-          furnitureService.registerGroundFurniture(furniture);
+          furnitureService.registerFurniture(furniture);
         }
         System.out.println("가구 데이터가 성공적으로 저장되었습니다.");
       } catch (IOException e) {
@@ -78,10 +78,8 @@ public class Init {
       }
     }
 
-
-
     if(!schoolService.existSchoolDatas()){
-      File file = new File("src/main/resources/dummy_schools.txt");
+      File file = new File("src/main/resources/dummy_all_school.txt");
       ObjectMapper objectMapper = new ObjectMapper();
 
       try {

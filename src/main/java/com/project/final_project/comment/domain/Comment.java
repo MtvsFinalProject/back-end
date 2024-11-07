@@ -1,6 +1,5 @@
 package com.project.final_project.comment.domain;
 
-import com.project.final_project.board.domain.Board;
 import com.project.final_project.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -52,9 +51,8 @@ public class Comment {
   @OneToMany(mappedBy = "parentComment", orphanRemoval = true)
   private List<Comment> childrenComment = new ArrayList<>();
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "board_id")
-  private Board board;
+  private String boardType;
+  private Integer boardId;
 
   @Column(name = "comment_time")
   private String timeStamp;
@@ -64,16 +62,13 @@ public class Comment {
     timeStamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
   }
 
-  public Comment(String content) {
+  public Comment(String content, String boardType, Integer boardId) {
     this.content = content;
+
   }
 
   public void updateWriter(User user) {
     this.writer = user;
-  }
-
-  public void updateBoard(Board board) {
-    this.board = board;
   }
 
   public void updateParent(Comment comment) {

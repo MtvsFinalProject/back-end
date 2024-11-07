@@ -1,12 +1,9 @@
 package com.project.final_project.furniture.domain;
-import com.project.final_project.myclassroom.domain.MyClassroom;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,13 +37,13 @@ public class Furniture {
   @Column(name = "rotation")
   private Integer rot;
 
-  @Column(name = "user_id")
-  private Integer userId;
+  @Column(name = "flip")
+  private Boolean flip;
 
   @Column(name = "map_id")
   private Integer mapId;
 
-  @ManyToOne
-  @JoinColumn(name = "my_classroom_id") // 외래 키 컬럼 명 설정
-  private MyClassroom myClassroom;
+  // 교실인지 학교인지 타입 구분 데이터 추가
+  @Column(name = "map_type")
+  private String mapType;
 }
