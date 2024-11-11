@@ -4,6 +4,7 @@ import com.project.final_project.user.dto.UserDTO;
 import com.project.final_project.user.service.UserService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -16,13 +17,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 @Configuration
 @EnableScheduling
 @RequiredArgsConstructor
+@Slf4j
 public class SchedulerConfig {
 
   private final JobLauncher jobLauncher;
   private final Job chatLogJob;
   private final UserService userService;
 
-//  @Scheduled(fixedDelay = 15000)
+//  @Scheduled(fixedDelay = 30000)
   public void runChatLogJob() {
     List<UserDTO> allUser = userService.getAllUser();  // 모든 유저 조회
 

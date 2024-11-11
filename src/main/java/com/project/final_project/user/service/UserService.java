@@ -28,7 +28,6 @@ public class UserService {
   }
 
   public List<UserDTO> getAllUser() {
-
     return userRepository.findAll().stream()
         .map(UserDTO::new)
         .collect(Collectors.toList());
@@ -70,6 +69,9 @@ public class UserService {
     if(dto.getStatusMesasge() != null) {
       foundUser.setStatusMessage(dto.getStatusMesasge());
     }
+    if(dto.getGold() != null) {
+      foundUser.setGold(dto.getGold());
+    }
     if(dto.getSchoolId() != null){
       School school = schoolRepository.findById(dto.getSchoolId()).orElseThrow(() -> new IllegalStateException("not found school id:" + dto.getSchoolId()));
       foundUser.setSchool(school);
@@ -103,6 +105,7 @@ public class UserService {
     user.setPassword(dto.getPassword());
     user.setPhone(dto.getPhone());
     user.setInterest(new ArrayList<>(dto.getInterest()));
+    user.setGold(100000);
 
     user.setLevel(1);
     user.setExp(0);
@@ -134,4 +137,34 @@ public class UserService {
         () -> new IllegalStateException("not found user id : " + userId))
     );
   }
+
+  @Transactional
+  public UserProfileDTO updateProfile(UserProfileDTO dto) {
+    User foundUser = userRepository.findById(dto.getId()).orElseThrow(
+        () -> new IllegalArgumentException("not found user id : " + dto.getId()));
+
+    foundUser.setName(dto.getName());
+    foundUser.setInterest(dto.getInterest());
+    foundUser.setStatusMessage(dto.getStatusMessage());
+
+    return dto;
+  }
+
+  public void setAllUserStatusToOffline() {
+    List<User> userList = userRepository.findAll();
+    userList.forEach(
+        user -> {
+          user.setIsOnline(false);
+          userRepository.save(user);
+        }
+    );
+  }
+
+  @Transactional
+  public void setUserStatusToOnline(Integer userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new IllegalStateException("not found user id : " + userId));
+    user.setIsOnline(true);
+  }
+
 }

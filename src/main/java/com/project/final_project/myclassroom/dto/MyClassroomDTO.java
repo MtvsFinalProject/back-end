@@ -16,28 +16,26 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class MyClassroomDTO {
 
   private Integer id;
   private User user;
   private Integer viewCount;
-  private String previewImageUrl;
   private Integer likeCount;
-  private List<Furniture> furnitureList = new ArrayList<>();
-  private String backgroundColor;
-  private Integer alpha;
+  private List<Furniture> furnitureList;
 
   public MyClassroomDTO(MyClassroom room) {
     this.id = room.getId();
     this.user = room.getUser();
     this.viewCount = room.getViewCount();
-    this.previewImageUrl = room.getPreviewImageUrl();
     this.likeCount = room.getLikeCount();
     this.furnitureList = room.getFurnitureList();
-    this.backgroundColor = room.getBackgroundColor();
-    this.alpha = room.getAlpha();
   }
 }

@@ -24,5 +24,6 @@ public class UserUpdateDTO {
   String phone;
   List<String> interest;
   String statusMesasge;
+  Integer gold;
   Integer schoolId;
 }

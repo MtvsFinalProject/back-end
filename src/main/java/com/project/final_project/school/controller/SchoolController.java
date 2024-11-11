@@ -6,6 +6,7 @@ import com.project.final_project.common.global.HttpResponseEntity.ResponseResult
 import com.project.final_project.school.domain.School;
 import com.project.final_project.school.dto.SchoolDTO;
 import com.project.final_project.school.dto.SchoolRegisterDTO;
+import com.project.final_project.school.dto.SchoolResponseDTO;
 import com.project.final_project.school.service.SchoolService;
 import com.project.final_project.user.domain.User;
 import com.project.final_project.user.dto.UserDTO;
@@ -50,6 +51,11 @@ public class SchoolController {
     return ResponseEntity.ok(userList.stream()
         .map(UserDTO::new)
         .collect(Collectors.toList()));
+  }
+
+  @GetMapping("/{schoolName}")
+  public List<SchoolResponseDTO> getSchoolListBySchoolName(@RequestParam("schoolName") String schoolName) {
+    return schoolService.getSchoolListBySchoolName(schoolName).stream().map(SchoolResponseDTO::new).toList();
   }
 
   @PostMapping

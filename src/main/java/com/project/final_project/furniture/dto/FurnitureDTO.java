@@ -3,9 +3,13 @@ package com.project.final_project.furniture.dto;
 import com.project.final_project.furniture.domain.Furniture;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class FurnitureDTO {
   private Integer id;
   private Integer objId;
@@ -26,4 +30,7 @@ public class FurnitureDTO {
     this.mapId = furniture.getMapId();
     this.mapType = furniture.getMapType();
   }
+
+
+
 }

@@ -22,6 +22,7 @@ public class UserRegisterDTO {
   String password;
   String phone;
   String statusMessage;
+  Integer gold;
   List<String> interest = new ArrayList<>();
   Integer schoolId;
 

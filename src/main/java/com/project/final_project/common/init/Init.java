@@ -57,26 +57,26 @@ public class Init {
 
 
 
-    if(!furnitureService.existsChatLogs()){
-      File file = new File("src/main/resources/dummy_furniture_data_30.txt");
-      ObjectMapper objectMapper = new ObjectMapper();
-
-      try {
-        // 파일에서 JSON 데이터를 읽어와 DTO 리스트로 변환
-        List<FurnitureRegisterDTO> furnitureData = objectMapper.readValue(file, new TypeReference<>() {});
-
-        // 데이터베이스에 저장
-        for (FurnitureRegisterDTO furniture : furnitureData) {
-          furnitureService.registerFurniture(furniture);
-        }
-        System.out.println("가구 데이터가 성공적으로 저장되었습니다.");
-      } catch (IOException e) {
-        e.printStackTrace();
-      } finally {
-        // Hibernate 쿼리 로그 다시 활성화
-        enableHibernateQueryLogging();
-      }
-    }
+//    if(!furnitureService.existsChatLogs()){
+//      File file = new File("src/main/resources/dummy_furniture_data_30.txt");
+//      ObjectMapper objectMapper = new ObjectMapper();
+//
+//      try {
+//        // 파일에서 JSON 데이터를 읽어와 DTO 리스트로 변환
+//        List<FurnitureRegisterDTO> furnitureData = objectMapper.readValue(file, new TypeReference<>() {});
+//
+//        // 데이터베이스에 저장
+//        for (FurnitureRegisterDTO furniture : furnitureData) {
+//          furnitureService.registerFurniture(furniture);
+//        }
+//        System.out.println("가구 데이터가 성공적으로 저장되었습니다.");
+//      } catch (IOException e) {
+//        e.printStackTrace();
+//      } finally {
+//        // Hibernate 쿼리 로그 다시 활성화
+//        enableHibernateQueryLogging();
+//      }
+//    }
 
     if(!schoolService.existSchoolDatas()){
       File file = new File("src/main/resources/dummy_all_school.txt");

@@ -20,9 +20,11 @@ public class QSchool extends EntityPathBase<School> {
 
     public static final QSchool school = new QSchool("school");
 
-    public final NumberPath<Integer> backgroundColorId = createNumber("backgroundColorId", Integer.class);
+    public final ListPath<com.project.final_project.furniture.domain.Furniture, com.project.final_project.furniture.domain.QFurniture> furnitureList = this.<com.project.final_project.furniture.domain.Furniture, com.project.final_project.furniture.domain.QFurniture>createList("furnitureList", com.project.final_project.furniture.domain.Furniture.class, com.project.final_project.furniture.domain.QFurniture.class, PathInits.DIRECT2);
 
     public final NumberPath<Integer> id = createNumber("id", Integer.class);
+
+    public final StringPath location = createString("location");
 
     public final StringPath schoolName = createString("schoolName");
 

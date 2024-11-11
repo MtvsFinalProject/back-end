@@ -92,4 +92,8 @@ public class SchoolService {
   public void deleteSchoolById(Integer schoolId) {
     schoolRepository.deleteById(schoolId);
   }
+
+  public List<School> getSchoolListBySchoolName(String schoolName) {
+    return schoolRepository.findBySchoolNameContaining(schoolName);
+  }
 }

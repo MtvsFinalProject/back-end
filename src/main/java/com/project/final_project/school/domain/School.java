@@ -44,6 +44,7 @@ public class School {
 
   // 각각의 유저에 해당하는 myClassroom을 갖고올 수 있음.
   @OneToMany(mappedBy = "school", cascade = CascadeType.ALL)
+  @JsonIgnore
   private List<User> userList = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL)

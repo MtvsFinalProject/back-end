@@ -1,6 +1,7 @@
 package com.project.final_project.myclassroom.dto;
 
 import com.project.final_project.furniture.domain.Furniture;
+import com.project.final_project.furniture.dto.FurnitureRegisterDTO;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,5 @@ import lombok.Setter;
 public class MyClassroomRegisterDTO {
 
   Integer userId;
-  String previewImageUrl;
-  String backgroundColor;
-  Integer alpha;
+  List<FurnitureRegisterDTO> furnitureList;
 }

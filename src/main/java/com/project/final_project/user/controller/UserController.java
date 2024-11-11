@@ -3,6 +3,7 @@ package com.project.final_project.user.controller;
 import static com.project.final_project.common.global.HttpResponseEntity.success;
 
 import com.project.final_project.common.global.HttpResponseEntity.ResponseResult;
+import com.project.final_project.schedule.service.UserStatusService;
 import com.project.final_project.user.domain.User;
 import com.project.final_project.user.dto.UserDTO;
 import com.project.final_project.user.dto.UserProfileDTO;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
   private final UserService userService;
+  private final UserStatusService userStatusService;
 
   @GetMapping
   public UserDTO getUserById(@RequestParam("userId") Integer id) {
@@ -53,6 +55,12 @@ public class UserController {
     return ResponseEntity.ok(userService.registerUser(dto));
   }
 
+  @PostMapping("/request-online-status")
+  public ResponseResult<String> requestOnlineStatus(@RequestParam("userId") Integer userId) {
+    userStatusService.addOnlineUser(userId);
+    return success("user id : " + userId + " set online");
+  }
+
   @PatchMapping
   public ResponseEntity<UserDTO> updateUser(@RequestBody UserUpdateDTO dto){
     return ResponseEntity.ok(userService.updateUser(dto));
@@ -69,7 +77,6 @@ public class UserController {
     return ResponseEntity.noContent().build();
   }
 
-
   //== 프로필 ==//
   @GetMapping("/profile/{userId}")
   public ResponseResult<UserProfileDTO> getProfile(@PathVariable("userId") Integer userId) {
@@ -77,8 +84,8 @@ public class UserController {
   }
 
   @PatchMapping("/profile")
-  public ResponseResult<UserProfileDTO> updateProfile(@RequestBody UserUpdateDTO dto) {
-    return success(new UserProfileDTO(userService.updateUser(dto)));
+  public ResponseResult<UserProfileDTO> updateProfile(@RequestBody UserProfileDTO dto) {
+    return success(new UserProfileDTO(userService.updateProfile(dto)));
   }
 
 }

@@ -26,6 +26,7 @@ public class UserDTO {
   String password;
   String phone;
   String statusMesasge;
+  Integer gold;
   List<String> interest = new ArrayList<>();
 
   SchoolResponseDTO school;
@@ -42,6 +43,7 @@ public class UserDTO {
     this.phone = user.getPhone();
     this.interest = user.getInterest();
     this.statusMesasge = user.getStatusMessage();
+    this.gold = user.getGold();
     this.school = new SchoolResponseDTO(user.getSchool());
   }
 }

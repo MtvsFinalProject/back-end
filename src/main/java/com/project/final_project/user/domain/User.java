@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,6 +26,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
   @Id
@@ -68,13 +70,20 @@ public class User {
   @Column(name = "user_status_message")
   String statusMessage;
 
+  @Column(name ="user_gold")
+  Integer gold;
+
   @ElementCollection
   @Column(name = "interest")
   List<String> interest = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "school_id")
+  @JsonIgnore
   School school;
+
+  @Column(name = "is_online")
+  Boolean isOnline;
 
   //==비즈니스 로직==//
   public void gainExp(Integer exp) {
@@ -92,27 +101,5 @@ public class User {
 
   private Integer calculateMaxExpForNextLevel(Integer level) {
     return 100 + (level - 1) * 50;
-  }
-
-
-  @Override
-  public String toString() {
-    return "User{" +
-        "id=" + id +
-        ", socialId='" + socialId + '\'' +
-        ", name='" + name + '\'' +
-        ", grade=" + grade +
-        ", birthday='" + birthday + '\'' +
-        ", gender=" + gender +
-        ", email='" + email + '\'' +
-        ", password='" + password + '\'' +
-        ", phone='" + phone + '\'' +
-        ", level=" + level +
-        ", exp=" + exp +
-        ", maxExp=" + maxExp +
-        ", statusMessage='" + statusMessage + '\'' +
-        ", interest=" + interest +
-        ", school=" + school +
-        '}';
   }
 }

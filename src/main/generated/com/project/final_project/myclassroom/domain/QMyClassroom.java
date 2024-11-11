@@ -22,17 +22,11 @@ public class QMyClassroom extends EntityPathBase<MyClassroom> {
 
     public static final QMyClassroom myClassroom = new QMyClassroom("myClassroom");
 
-    public final NumberPath<Integer> alpha = createNumber("alpha", Integer.class);
-
-    public final StringPath backgroundColor = createString("backgroundColor");
-
     public final ListPath<com.project.final_project.furniture.domain.Furniture, com.project.final_project.furniture.domain.QFurniture> furnitureList = this.<com.project.final_project.furniture.domain.Furniture, com.project.final_project.furniture.domain.QFurniture>createList("furnitureList", com.project.final_project.furniture.domain.Furniture.class, com.project.final_project.furniture.domain.QFurniture.class, PathInits.DIRECT2);
 
     public final NumberPath<Integer> id = createNumber("id", Integer.class);
 
     public final NumberPath<Integer> likeCount = createNumber("likeCount", Integer.class);
-
-    public final StringPath previewImageUrl = createString("previewImageUrl");
 
     public final com.project.final_project.user.domain.QUser user;
 

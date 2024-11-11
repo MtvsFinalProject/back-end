@@ -28,19 +28,19 @@ public class FurnitureController {
   private final FurnitureService furnitureService;
 
   @GetMapping("/list")
-  public ResponseResult<List<FurnitureDTO>> getAllFurniture() {
-    return success(furnitureService.getAllFurniture());
+  public List<FurnitureDTO> getAllFurniture() {
+    return furnitureService.getAllFurniture();
   }
 
   @GetMapping("/list/map/{mapId}/{mapType}")
-  public ResponseResult<List<FurnitureDTO>> getFurnitureListByMapIdAndMapType(
+  public List<FurnitureDTO> getFurnitureListByMapIdAndMapType(
       @PathVariable("mapId") Integer mapId, @PathVariable("mapType") String mapType) {
-    return success(furnitureService.getFurnitureListByMapIdAndMapType(mapId, mapType));
+    return furnitureService.getFurnitureListByMapIdAndMapType(mapId, mapType);
   }
 
   @GetMapping
-  public ResponseResult<FurnitureDTO> getFurnitureById(@RequestParam("furnitureId") Integer id) {
-    return success(furnitureService.getFurnitureById(id));
+  public FurnitureDTO getFurnitureById(@RequestParam("furnitureId") Integer id) {
+    return furnitureService.getFurnitureById(id);
   }
 
   @PostMapping

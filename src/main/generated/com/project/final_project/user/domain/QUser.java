@@ -22,27 +22,29 @@ public class QUser extends EntityPathBase<User> {
 
     public static final QUser user = new QUser("user");
 
-    public final NumberPath<Integer> age = createNumber("age", Integer.class);
-
     public final StringPath birthday = createString("birthday");
 
     public final StringPath email = createString("email");
 
     public final NumberPath<Integer> exp = createNumber("exp", Integer.class);
 
-    public final StringPath gender = createString("gender");
+    public final BooleanPath gender = createBoolean("gender");
+
+    public final NumberPath<Integer> gold = createNumber("gold", Integer.class);
 
     public final NumberPath<Integer> grade = createNumber("grade", Integer.class);
 
     public final NumberPath<Integer> id = createNumber("id", Integer.class);
+
+    public final ListPath<String, StringPath> interest = this.<String, StringPath>createList("interest", String.class, StringPath.class, PathInits.DIRECT2);
+
+    public final BooleanPath isOnline = createBoolean("isOnline");
 
     public final NumberPath<Integer> level = createNumber("level", Integer.class);
 
     public final NumberPath<Integer> maxExp = createNumber("maxExp", Integer.class);
 
     public final StringPath name = createString("name");
-
-    public final StringPath nickname = createString("nickname");
 
     public final StringPath password = createString("password");
 
@@ -51,6 +53,8 @@ public class QUser extends EntityPathBase<User> {
     public final com.project.final_project.school.domain.QSchool school;
 
     public final StringPath socialId = createString("socialId");
+
+    public final StringPath statusMessage = createString("statusMessage");
 
     public QUser(String variable) {
         this(User.class, forVariable(variable), INITS);

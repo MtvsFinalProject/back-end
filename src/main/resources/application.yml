@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   datasource:
@@ -49,4 +49,14 @@ kakao:
     url: http://125.132.216.190:5544/login/oauth2/code/kakao
 
 
-
+cloud:
+  aws:
+    s3:
+      bucket: 1-1-final-project
+    stack:
+      auto: false
+    region:
+      static: ap-northeast-2
+    credentials:
+      access-key: AKIATG6MGVGV5KILEK6H
+      secret-key: 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
