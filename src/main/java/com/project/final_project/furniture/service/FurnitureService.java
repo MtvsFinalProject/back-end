@@ -1,11 +1,16 @@
 package com.project.final_project.furniture.service;
 
 import com.project.final_project.furniture.domain.Furniture;
+import com.project.final_project.furniture.dto.FurnitureCountDTO;
+import com.project.final_project.furniture.dto.FurnitureDeleteDTO;
 import com.project.final_project.furniture.dto.FurnitureRegisterDTO;
 import com.project.final_project.furniture.dto.FurnitureDTO;
 import com.project.final_project.furniture.dto.FurnitureUpdateDTO;
 import com.project.final_project.furniture.repository.FurnitureRepository;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,6 +84,29 @@ public class FurnitureService {
     furnitureRepository.deleteById(furnitureId);
   }
 
+  @Transactional
+  public List<FurnitureDeleteDTO> deleteMyClassroomFurnitureListByUserIdForRemovedCount(Integer userId) {
+    List<Furniture> furnitureList = furnitureRepository.getFurnitureListByUserId(userId);
+    List<FurnitureDeleteDTO> res = new ArrayList<>();
+
+    // objectId 기준으로 그룹화
+    Map<Integer, List<Furniture>> groupedByObjectId = furnitureList.stream()
+        .collect(Collectors.groupingBy(Furniture::getObjId));
+
+    // 각 그룹을 삭제하고 삭제된 정보를 FurnitureDeleteDTO에 추가
+    groupedByObjectId.forEach((objectId, items) -> {
+      int removedCount = items.size();
+
+      // FurnitureDeleteDTO에 삭제된 정보 추가
+      res.add(new FurnitureDeleteDTO(objectId, removedCount));
+
+      // 실제 삭제 수행
+      furnitureRepository.deleteAll(items);
+    });
+
+    return res;
+  }
+
   public boolean existsChatLogs() {
     return furnitureRepository.count() > 0;
   }
@@ -90,5 +118,29 @@ public class FurnitureService {
   public List<FurnitureDTO> getFurnitureListByMapIdAndMapType(Integer mapId, String mapType) {
     List<Furniture> furnitureList = furnitureRepository.getFurnitureListByMapIdAndMapType(mapId, mapType);
     return furnitureList.stream().map(FurnitureDTO::new).toList();
+  }
+
+  public List<FurnitureCountDTO> getMyClassroomFurnitureListByUserIdForCount(Integer userId) {
+    List<Furniture> furnitureList = furnitureRepository.getFurnitureListByUserId(userId);
+    List<FurnitureCountDTO> res = new ArrayList<>();
+
+    // objectId 기준으로 그룹화
+    Map<Integer, List<Furniture>> groupedByObjectId = furnitureList.stream()
+        .collect(Collectors.groupingBy(Furniture::getObjId));
+
+    // 각 그룹을 삭제하고 삭제된 정보를 FurnitureDeleteDTO에 추가
+    groupedByObjectId.forEach((objectId, items) -> {
+      int count = items.size();
+
+      // FurnitureDeleteDTO에 삭제된 정보 추가
+      res.add(new FurnitureCountDTO(objectId, count));
+    });
+
+    return res;
+  }
+
+  public void deleteMyClassroomFurnituresByUserId(Integer userId) {
+    List<Furniture> furnitureList = furnitureRepository.getFurnitureListByUserId(userId);
+    furnitureRepository.deleteAll(furnitureList);
   }
 }

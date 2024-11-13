@@ -12,4 +12,7 @@ public interface FurnitureRepository extends JpaRepository<Furniture, Integer> {
 
   @Query("select f from Furniture f where f.mapId = :mapId and f.mapType = :mapType ")
   List<Furniture> getFurnitureListByMapIdAndMapType(@Param("mapId") Integer mapId, @Param("mapType") String mapType);
+
+  @Query("select f from Furniture f where f.mapId = :userId")
+  List<Furniture> getFurnitureListByUserId(@Param("userId") Integer userId);
 }

@@ -1,4 +1,5 @@
 package com.project.final_project.furniture.domain;
+import com.project.final_project.furniture.dto.FurnitureDTO;
 import com.project.final_project.furniture.dto.FurnitureRegisterDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -60,6 +61,7 @@ public class Furniture {
 
   // 복사 생성자 (FurnitureRegisterDTO를 사용)
   public Furniture(FurnitureRegisterDTO dto) {
+    this.id = null;
     this.objId = dto.getObjId();
     this.x = dto.getX();
     this.y = dto.getY();
@@ -68,6 +70,18 @@ public class Furniture {
     this.mapId = dto.getMapId();
     this.mapType = dto.getMapType();
   }
+
+  public Furniture(FurnitureDTO furniture) {
+    this.id = furniture.getId();
+    this.objId = furniture.getObjId();
+    this.x = furniture.getX();
+    this.y = furniture.getY();
+    this.rot = furniture.getRot();
+    this.flip = furniture.getFlip();
+    this.mapId = furniture.getMapId();
+    this.mapType = furniture.getMapType();
+  }
+
 
   @Override
   public String toString() {

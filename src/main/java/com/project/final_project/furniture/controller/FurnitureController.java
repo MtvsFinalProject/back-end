@@ -3,9 +3,13 @@ package com.project.final_project.furniture.controller;
 import static com.project.final_project.common.global.HttpResponseEntity.success;
 
 import com.project.final_project.common.global.HttpResponseEntity.ResponseResult;
+import com.project.final_project.furniture.domain.Furniture;
+import com.project.final_project.furniture.dto.FurnitureCountDTO;
+import com.project.final_project.furniture.dto.FurnitureDeleteDTO;
 import com.project.final_project.furniture.dto.FurnitureRegisterDTO;
 import com.project.final_project.furniture.dto.FurnitureDTO;
 import com.project.final_project.furniture.dto.FurnitureUpdateDTO;
+import com.project.final_project.furniture.repository.FurnitureRepository;
 import com.project.final_project.furniture.service.FurnitureService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +47,11 @@ public class FurnitureController {
     return furnitureService.getFurnitureById(id);
   }
 
+  @GetMapping("/list/{userId}")
+  public ResponseResult<List<FurnitureCountDTO>> getMyClassroomFurnitureListByUserId(@PathVariable("userId") Integer userId) {
+    return success(furnitureService.getMyClassroomFurnitureListByUserIdForCount(userId));
+  }
+
   @PostMapping
   public ResponseEntity<Integer> registerFurniture(@RequestBody FurnitureRegisterDTO furnitureRegisterDTO) {
     return ResponseEntity.ok(furnitureService.registerFurniture(furnitureRegisterDTO));
@@ -57,5 +66,16 @@ public class FurnitureController {
   public ResponseEntity<?> removeFurniture(@RequestParam("furnitureId") Integer furnitureId) {
     furnitureService.deleteFurniture(furnitureId);
     return ResponseEntity.noContent().build();
+  }
+
+  @DeleteMapping("/list/{userId}")
+  public ResponseEntity<?> deleteMyClassroomFurnituresByUserId(@PathVariable("userId") Integer userId) {
+    furnitureService.deleteMyClassroomFurnituresByUserId(userId);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/list/{userId}")
+  public ResponseResult<List<FurnitureDeleteDTO>> deleteMyClassroomFurnitureListByUserId(@PathVariable("userId") Integer userId) {
+    return success(furnitureService.deleteMyClassroomFurnitureListByUserIdForRemovedCount(userId));
   }
 }
