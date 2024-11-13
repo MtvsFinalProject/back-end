@@ -29,11 +29,10 @@ public class SchedulerConfig {
     List<UserDTO> allUser = userService.getAllUser();  // 모든 유저 조회
 
     for (UserDTO user : allUser) {
-      Long senderId = user.getId().longValue();  // 유저별 senderId 가져오기
-      System.out.println("senderId = " + senderId);
+      Long userId = user.getId().longValue();  // 유저별 senderId 가져오기
 
       JobParameters jobParameters = new JobParametersBuilder()
-          .addLong("senderId", senderId)  // JobParameters에 senderId 전달
+          .addLong("userId", userId)  // JobParameters에 senderId 전달
           .addLong("time", System.currentTimeMillis())  // 고유한 파라미터
           .toJobParameters();
 

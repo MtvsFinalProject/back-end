@@ -2,8 +2,10 @@ package com.project.final_project.common.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import jakarta.servlet.Filter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 @Configuration
 public class SwaggerConfig {
@@ -19,5 +21,4 @@ public class SwaggerConfig {
             .description("springdoc-openapi swagger-ui 화면입니다.")
         );
   }
-
 }
