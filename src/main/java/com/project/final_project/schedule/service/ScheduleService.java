@@ -1,5 +1,6 @@
 package com.project.final_project.schedule.service;
 
+import com.project.final_project.user.dto.UserRequestOnlineStatusDTO;
 import com.project.final_project.user.service.UserService;
 import jakarta.annotation.PostConstruct;
 import java.util.HashSet;
@@ -43,8 +44,8 @@ public class UserStatusService {
   }
 
   // 특정 유저 상태를 온라인으로 설정
-  public synchronized void addOnlineUser(Integer userId) {
-    userIds.add(userId);
+  public synchronized void addOnlineUser(UserRequestOnlineStatusDTO dto) {
+    userIds.add(dto.getUserId());
   }
 
   @PostConstruct
