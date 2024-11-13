@@ -78,8 +78,6 @@ public class KakaoService {
       JSONParser jsonParser = new JSONParser();
       JSONObject jsonObj = (JSONObject) jsonParser.parse(response.getBody());
 
-      log.info("response(existToken)={}",response);
-
       accessToken  = (String) jsonObj.get("access_token");
       refreshToken = (String) jsonObj.get("refresh_token");
 
@@ -108,8 +106,6 @@ public class KakaoService {
         httpEntity,
         String.class
     );
-
-    log.info("response(userInfo)={}", response);
 
     //Response 데이터 파싱
     JSONParser jsonParser = new JSONParser();
@@ -184,8 +180,6 @@ public class KakaoService {
           httpEntity,
           String.class
       );
-
-      log.info("response(unlink)={}", response);
 
       // 연동 끊기 성공 여부 확인
       if (response.getStatusCode().is2xxSuccessful()) {
