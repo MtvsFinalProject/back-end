@@ -3,15 +3,13 @@ package com.project.final_project.mapcontest.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.project.final_project.furniture.domain.Furniture;
-import com.project.final_project.furniture.dto.FurnitureDTO;
+import com.project.final_project.furniture.repository.FurnitureRepository;
+import com.project.final_project.furniture.service.FurnitureService;
 import com.project.final_project.mapcontest.domain.MapContest;
 import com.project.final_project.mapcontest.dto.MapContestDTO;
+import com.project.final_project.mapcontest.dto.MapContestFurnitureVoDTO;
 import com.project.final_project.mapcontest.dto.MapContestRegisterDTO;
 import com.project.final_project.mapcontest.repository.MapContestRepository;
-import com.project.final_project.myclassroom.domain.MyClassroom;
-import com.project.final_project.myclassroom.repository.MyClassroomRepository;
-import com.project.final_project.user.domain.User;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -19,6 +17,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -26,7 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class MapContestService {
 
   private final MapContestRepository mapContestRepository;
-  private final MyClassroomRepository myClassroomRepository;
+  private final FurnitureService furnitureService;
+  private final FurnitureRepository furnitureRepository;
 
   @Value("${cloud.aws.s3.bucket}")
   private String BUCKET;
@@ -34,11 +34,18 @@ public class MapContestService {
 
   public MapContestDTO registerMapContest(MapContestRegisterDTO dto) {
 
-    MyClassroom foundMyClassroom = myClassroomRepository.getMyClassroomListByUserId(dto.getUserId());
-
     // 깊은 복사 수행
-    List<Furniture> copiedFurnitureList = foundMyClassroom.getFurnitureList().stream()
-        .map(furniture -> new Furniture(furniture)) // Furniture 클래스에 복사 생성자 필요
+    List<MapContestFurnitureVoDTO> copiedFurnitureList = furnitureService
+        .getFurnitureListByMapIdAndMapType(dto.getUserId(), "MyClassroom").stream()
+        .map(f -> new MapContestFurnitureVoDTO(
+            f.getObjId(),
+            f.getX(),
+            f.getY(),
+            f.getRot(),
+            f.getFlip(),
+            f.getMapId(),
+            f.getMapType())
+        )
         .collect(Collectors.toList());
 
     MapContest mapContest = MapContest.builder()
@@ -55,8 +62,6 @@ public class MapContestService {
 
     return new MapContestDTO(savedMapContest);
   }
-
-
 
   public void upload(MultipartFile file, String fileName) {
     try {
@@ -89,13 +94,76 @@ public class MapContestService {
     mapContestRepository.deleteById(mapContestId);
   }
 
-  public List<MapContestDTO> getAllFurnitureList() {
-    return mapContestRepository.findAll().stream().map(MapContestDTO::new).toList();
+  public List<MapContestDTO> getAllMapContestList() {
+    return mapContestRepository
+        .findAll()
+        .stream()
+        .sorted((m1, m2) -> Integer.compare(m2.getLikeCount(), m1.getLikeCount())) // likeCount 기준 내림차순 정렬
+        .map(MapContestDTO::new)
+        .toList();
   }
 
-  public List<FurnitureDTO> getFurnitureListByMapContestId(Integer mapContestId) {
+  public List<MapContestFurnitureVoDTO> getFurnitureListByMapContestId(Integer mapContestId) {
     MapContest mapContest = mapContestRepository.findById(mapContestId).orElseThrow(
         () -> new IllegalStateException("not found mapcontest id : " + mapContestId));
-    return mapContest.getFurnitureList().stream().map(FurnitureDTO::new).toList();
+
+    return mapContest.getFurnitureList()
+        .stream()
+        .map(f -> new MapContestFurnitureVoDTO(
+        f.getObjId(),
+        f.getX(),
+        f.getY(),
+        f.getRot(),
+        f.getFlip(),
+        f.getUserId(),
+        f.getMapType())
+        ).toList();
   }
+
+  @Transactional
+  public MapContestDTO updateMapContest(MapContestDTO dto) {
+
+    // 기존의 MapContest 엔티티 조회
+    MapContest foundMapContest = mapContestRepository.findById(dto.getId()).orElseThrow(
+        () -> new IllegalStateException("not found mapContest id : " + dto.getId())
+    );
+
+    // DTO의 값으로 엔티티 업데이트
+    if (dto.getTitle() != null) {
+      foundMapContest.setTitle(dto.getTitle());
+    }
+
+    if (dto.getDescription() != null) {
+      foundMapContest.setDescription(dto.getDescription());
+    }
+
+    if (dto.getPreviewImageUrl() != null) {
+      foundMapContest.setPreviewImageUrl(dto.getPreviewImageUrl());
+    }
+
+    if (dto.getLikeCount() != null) {
+      foundMapContest.setLikeCount(dto.getLikeCount());
+    }
+
+    if (dto.getViewCount() != null) {
+      foundMapContest.setViewCount(dto.getViewCount());
+    }
+
+    if (dto.getUserId() != null) {
+      foundMapContest.setUserId(dto.getUserId());
+    }
+
+    // furnitureList 업데이트
+    if (dto.getFurnitureList() != null) {
+      List<MapContestFurnitureVoDTO> updatedFurnitureList = dto.getFurnitureList();
+      foundMapContest.setFurnitureList(updatedFurnitureList);
+    }
+
+    // 변경된 엔티티를 저장
+    MapContest updatedMapContest = mapContestRepository.save(foundMapContest);
+
+    // 업데이트된 엔티티를 기반으로 새 DTO 반환
+    return new MapContestDTO(updatedMapContest);
+  }
+
 }

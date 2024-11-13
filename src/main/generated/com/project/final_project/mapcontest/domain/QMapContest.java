@@ -22,13 +22,11 @@ public class QMapContest extends EntityPathBase<MapContest> {
 
     public final StringPath description = createString("description");
 
-    public final ListPath<com.project.final_project.furniture.domain.Furniture, com.project.final_project.furniture.domain.QFurniture> furnitureList = this.<com.project.final_project.furniture.domain.Furniture, com.project.final_project.furniture.domain.QFurniture>createList("furnitureList", com.project.final_project.furniture.domain.Furniture.class, com.project.final_project.furniture.domain.QFurniture.class, PathInits.DIRECT2);
+    public final ListPath<com.project.final_project.mapcontest.dto.MapContestFurnitureVoDTO, com.project.final_project.mapcontest.dto.QMapContestFurnitureVoDTO> furnitureList = this.<com.project.final_project.mapcontest.dto.MapContestFurnitureVoDTO, com.project.final_project.mapcontest.dto.QMapContestFurnitureVoDTO>createList("furnitureList", com.project.final_project.mapcontest.dto.MapContestFurnitureVoDTO.class, com.project.final_project.mapcontest.dto.QMapContestFurnitureVoDTO.class, PathInits.DIRECT2);
 
     public final NumberPath<Integer> id = createNumber("id", Integer.class);
 
     public final NumberPath<Integer> likeCount = createNumber("likeCount", Integer.class);
-
-    public final NumberPath<Integer> mapId = createNumber("mapId", Integer.class);
 
     public final StringPath previewImageUrl = createString("previewImageUrl");
 

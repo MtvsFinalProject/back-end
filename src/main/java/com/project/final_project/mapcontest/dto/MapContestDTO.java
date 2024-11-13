@@ -12,10 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MapContestDTO {
   private Integer id;
-  private Integer mapId;
   private String title;
   private String description;
-  private List<Furniture> furnitureList;
+  private List<MapContestFurnitureVoDTO> furnitureList;
   private String previewImageUrl;
   private Integer likeCount = 0;
   private Integer viewCount = 0;
@@ -23,7 +22,6 @@ public class MapContestDTO {
 
   public MapContestDTO(MapContest m){
     this.id = m.getId();
-    this.mapId = m.getMapId();
     this.title= m.getTitle();
     this.description = m.getDescription();
     this.furnitureList = m.getFurnitureList();

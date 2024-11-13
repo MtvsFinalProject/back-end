@@ -5,6 +5,7 @@ import static com.project.final_project.common.global.HttpResponseEntity.success
 import com.project.final_project.common.global.HttpResponseEntity.ResponseResult;
 import com.project.final_project.furniture.dto.FurnitureDTO;
 import com.project.final_project.mapcontest.dto.MapContestDTO;
+import com.project.final_project.mapcontest.dto.MapContestFurnitureVoDTO;
 import com.project.final_project.mapcontest.dto.MapContestRegisterDTO;
 import com.project.final_project.mapcontest.service.MapContestService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -78,18 +80,23 @@ public class MapContestController {
 
   @GetMapping("/list")
   public ResponseResult<List<MapContestDTO>> getAllMapContestList() {
-    return success(mapContestService.getAllFurnitureList());
+    return success(mapContestService.getAllMapContestList());
   }
 
   @GetMapping("/furniture-list/{mapContestId}")
-  public List<FurnitureDTO> getFurnitureListByMapContestId(@PathVariable("mapContestId") Integer mapContestId) {
+  public List<MapContestFurnitureVoDTO> getFurnitureListByMapContestId(@PathVariable("mapContestId") Integer mapContestId) {
     return mapContestService.getFurnitureListByMapContestId(mapContestId);
   }
 
-  @Operation(summary = "맵 콘테스트에 나만의 교실 스냅샷 등록", description = "맵 콘테스트에 나만의 교실 스냅샷을 등록합니다. 이때 furniture, my_classroom에 데이터가 있어야 맵 콘테스트에 등록을 할 수가 있습니다.")
+  @Operation(summary = "맵 콘테스트에 나만의 교실 스냅샷 등록", description = "맵 콘테스트에 나만의 교실 스냅샷을 등록합니다. 이때 furniture 데이터가 있어야 맵 콘테스트에 등록을 할 수가 있습니다.")
   @PostMapping
   public ResponseResult<MapContestDTO> registerMapContest(@RequestBody MapContestRegisterDTO dto){
     return success(mapContestService.registerMapContest(dto));
+  }
+
+  @PatchMapping
+  public ResponseResult<MapContestDTO> updateMapContest(@RequestBody MapContestDTO dto){
+    return success(mapContestService.updateMapContest(dto));
   }
 
   @DeleteMapping

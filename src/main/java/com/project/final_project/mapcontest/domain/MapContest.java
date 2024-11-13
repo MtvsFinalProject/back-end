@@ -1,7 +1,9 @@
 package com.project.final_project.mapcontest.domain;
 
 import com.project.final_project.furniture.domain.Furniture;
+import com.project.final_project.mapcontest.dto.MapContestFurnitureVoDTO;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -32,9 +34,6 @@ public class MapContest {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @Column(name = "map_id")
-  private Integer mapId;
-
   @Column(name = "user_id")
   private Integer userId;
 
@@ -44,9 +43,12 @@ public class MapContest {
   @Column(name = "description")
   private String description;
 
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinTable(name = "map_contest_furniture_list", joinColumns = @JoinColumn(name = "map_contest_id"))
-  private List<Furniture> furnitureList;
+  @ElementCollection
+  @CollectionTable(
+      name = "map_contest_furniture_list",
+      joinColumns = @JoinColumn(name = "map_contest_id")
+  )
+  private List<MapContestFurnitureVoDTO> furnitureList;
 
   @Column(name = "preview_image_url")
   private String previewImageUrl;
