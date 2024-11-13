@@ -77,13 +77,16 @@ public class User {
   @Column(name = "interest")
   List<String> interest = new ArrayList<>();
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "school_id")
   @JsonIgnore
   School school;
 
   @Column(name = "is_online")
   Boolean isOnline;
+
+  @Column(name = "entered_date")
+  String enteredDate;
 
   //==비즈니스 로직==//
   public void gainExp(Integer exp) {

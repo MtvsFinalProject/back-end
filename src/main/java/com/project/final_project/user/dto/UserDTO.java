@@ -28,6 +28,7 @@ public class UserDTO {
   String statusMesasge;
   Integer gold;
   List<String> interest = new ArrayList<>();
+  Boolean isOnline;
 
   SchoolResponseDTO school;
 
@@ -44,6 +45,7 @@ public class UserDTO {
     this.interest = user.getInterest();
     this.statusMesasge = user.getStatusMessage();
     this.gold = user.getGold();
+    this.isOnline = user.getIsOnline();
     this.school = new SchoolResponseDTO(user.getSchool());
   }
 }

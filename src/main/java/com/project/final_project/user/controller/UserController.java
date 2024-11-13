@@ -3,12 +3,13 @@ package com.project.final_project.user.controller;
 import static com.project.final_project.common.global.HttpResponseEntity.success;
 
 import com.project.final_project.common.global.HttpResponseEntity.ResponseResult;
-import com.project.final_project.schedule.service.UserStatusService;
+import com.project.final_project.schedule.service.ScheduleService;
 import com.project.final_project.user.domain.User;
 import com.project.final_project.user.dto.UserDTO;
 import com.project.final_project.user.dto.UserProfileDTO;
 import com.project.final_project.user.dto.UserRegisterDTO;
 import com.project.final_project.user.dto.UserRegisterSchoolDTO;
+import com.project.final_project.user.dto.UserRequestOnlineStatusDTO;
 import com.project.final_project.user.dto.UserUpdateDTO;
 import com.project.final_project.user.service.UserService;
 import java.util.List;
@@ -30,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
   private final UserService userService;
-  private final UserStatusService userStatusService;
+  private final ScheduleService scheduleService;
 
   @GetMapping
   public UserDTO getUserById(@RequestParam("userId") Integer id) {
@@ -53,12 +54,6 @@ public class UserController {
   @PostMapping
   public ResponseEntity<UserDTO> registerUser(@RequestBody UserRegisterDTO dto){
     return ResponseEntity.ok(userService.registerUser(dto));
-  }
-
-  @PostMapping("/request-online-status")
-  public ResponseResult<String> requestOnlineStatus(@RequestParam("userId") Integer userId) {
-    userStatusService.addOnlineUser(userId);
-    return success("user id : " + userId + " set online");
   }
 
   @PatchMapping

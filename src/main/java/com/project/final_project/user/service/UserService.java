@@ -9,7 +9,10 @@ import com.project.final_project.user.dto.UserRegisterDTO;
 import com.project.final_project.user.dto.UserRegisterSchoolDTO;
 import com.project.final_project.user.dto.UserUpdateDTO;
 import com.project.final_project.user.repository.UserRepository;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -80,6 +83,7 @@ public class UserService {
     return new UserDTO(foundUser);
   }
 
+  @Transactional
   public void removeUser(Integer id) {
     userRepository.deleteById(id);
   }
@@ -150,6 +154,7 @@ public class UserService {
     return dto;
   }
 
+  @Transactional
   public void setAllUserStatusToOffline() {
     List<User> userList = userRepository.findAll();
     userList.forEach(
@@ -164,6 +169,12 @@ public class UserService {
   public void setUserStatusToOnline(Integer userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalStateException("not found user id : " + userId));
+
+    // 현재 날짜 및 시간을 ISO 8601 형식으로 포맷
+    DateTimeFormatter isoFormatter = DateTimeFormatter.ISO_DATE_TIME;
+    String formattedDate = LocalDateTime.now().format(isoFormatter);
+
+    user.setEnteredDate(formattedDate);
     user.setIsOnline(true);
   }
 
