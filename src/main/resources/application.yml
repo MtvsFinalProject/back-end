@@ -1,5 +1,10 @@
 server:
   port: 8081
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 spring:
   datasource:
@@ -13,14 +18,20 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         dialect: org.hibernate.dialect.MySQLDialect
     database: mysql
     show-sql: false
 
+  springdoc:
+    api-docs:
+      encoding: UTF-8
+
 
 logging:
   level:
+    root: ERROR
+    org.springframework.batch: ERROR
     org.hibernate.SQL: debug
     org.hibernate.type: trace
 

@@ -7,7 +7,6 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -22,7 +21,11 @@ public class QAIRecommendation extends EntityPathBase<AIRecommendation> {
 
     public final NumberPath<Integer> id = createNumber("id", Integer.class);
 
-    public final ListPath<Integer, NumberPath<Integer>> recommendedFriendIds = this.<Integer, NumberPath<Integer>>createList("recommendedFriendIds", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final NumberPath<Integer> recommendedUserId = createNumber("recommendedUserId", Integer.class);
+
+    public final NumberPath<Double> similarity = createNumber("similarity", Double.class);
+
+    public final StringPath similarityMessage = createString("similarityMessage");
 
     public final NumberPath<Integer> userId = createNumber("userId", Integer.class);
 

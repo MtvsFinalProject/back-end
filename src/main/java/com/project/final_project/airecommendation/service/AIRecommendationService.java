@@ -5,12 +5,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.final_project.airecommendation.domain.AIRecommendation;
 import com.project.final_project.airecommendation.dto.AIResponseDTO;
+import com.project.final_project.airecommendation.dto.RecommendResponseDTO;
 import com.project.final_project.airecommendation.repository.AIRecommendationRepository;
 import com.project.final_project.chatlog.domain.ChatLog;
+import com.project.final_project.school.domain.School;
 import com.project.final_project.user.domain.User;
 import com.project.final_project.user.service.UserService;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.batch.item.Chunk;
 import java.util.HashMap;
@@ -30,7 +34,7 @@ public class AIRecommendationService {
   private final ObjectMapper objectMapper = new ObjectMapper();
   private final UserService userService;
 
-  private static final String AI_URL = "http://localhost:8000/recommend";
+  private static final String AI_URL = "https://certainly-legal-grubworm.ngrok-free.app/recommend/";
 
   // 20개의 ChatLog 메시지를 객체 형태로 추출하여 AI 서버에 전송
   public AIResponseDTO sendToAI(Chunk<? extends ChatLog> chatLogs, Long senderId) {
@@ -81,35 +85,49 @@ public class AIRecommendationService {
     return aiResponse;
   }
 
-  public boolean isExistBySenderIdAndFriendId(Integer senderId, Integer friendId) {
-    return aiRecommendationRepository.existsByUserIdAndRecommendedFriendId(senderId, friendId);
-  }
 
   public void saveRecommendation(AIRecommendation recommendation) {
     System.out.println("recommendations = " + recommendation);
     aiRecommendationRepository.save(recommendation);
   }
 
-  public List<Integer> getRecommendedFriendIds(Integer userId) {
-    AIRecommendation aiRecommendation = aiRecommendationRepository.getRecommendationByUserId(userId)
-        .orElseThrow(
-            () -> new IllegalStateException("not found recommendation userId : " + userId));
-    return aiRecommendation.getRecommendedFriendIds();
+  public List<RecommendResponseDTO> getRecommendationInfoList(Integer userId) {
+
+    List<RecommendResponseDTO> res = new ArrayList<>();
+
+    List<AIRecommendation> all = aiRecommendationRepository.findAIRecommendationListByUserId(userId); // senderId, message, similarity
+
+    all.forEach(
+        ar -> {
+          User user = userService.getUser(ar.getUserId());
+          User recommendedUser = userService.getUser(ar.getRecommendedUserId());
+          School recommendedUserSchool = recommendedUser.getSchool();
+
+          RecommendResponseDTO rrDTO = new RecommendResponseDTO(
+              recommendedUser.getId(),
+              user.getName(),
+              ar.getSimilarity(),
+              recommendedUser.getIsOnline(),
+              "매우 추천",
+              recommendedUser.getGrade(),
+              recommendedUserSchool == null ? "not registered school" : recommendedUserSchool.getLocation(),
+              recommendedUser.getInterest(),
+              ar.getSimilarityMessage(),
+              "user avartar image url"
+          );
+          res.add(rrDTO);
+        }
+    );
+
+    return res;
   }
 
-  public List<String> getRecommendedFriendNames(Integer userId) {
-    AIRecommendation aiRecommendation = aiRecommendationRepository.getRecommendationByUserId(userId)
-        .orElseThrow(() -> new IllegalStateException("not found recommendation userId : " + userId));
-
-    return aiRecommendation.getRecommendedFriendIds().stream()
-        .map(id -> {
-          User foundUser = userService.getUser(id);
-          return foundUser.getName();
-        })
-        .collect(Collectors.toList());
+  public boolean isExistRecommendedUser(Integer senderId, Integer recommendedUserId) {
+    return aiRecommendationRepository.getRecommendationByUserIdAndRecommendedUserId(
+        senderId, recommendedUserId).isPresent();
   }
 
-  public AIRecommendation getRecommendByUserId(Integer senderId) {
-    return aiRecommendationRepository.getRecommendationByUserId(senderId).orElse(null);
+  public void deleteRecommendationInfo(Integer recommendationInfoId) {
+    aiRecommendationRepository.deleteById(recommendationInfoId);
   }
 }

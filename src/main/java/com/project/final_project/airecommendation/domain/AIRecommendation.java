@@ -11,11 +11,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "ai_recommend")
 @Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class AIRecommendation {
 
   @Id
@@ -26,29 +32,36 @@ public class AIRecommendation {
   private Integer userId;
 
   // 추천된 친구들의 ID 목록
-  @ElementCollection
-  @CollectionTable(name = "recommended_friend_ids",
-                  joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"))
-  private List<Integer> recommendedFriendIds = new ArrayList<>();  // 빈 리스트로 초기화
+//  @ElementCollection
+//  @CollectionTable(name = "recommended_friend_ids",
+//                  joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"))
+//  private List<Integer> recommendedFriendIds = new ArrayList<>();  // 빈 리스트로 초기화
 
-  // Getters and Setters
-  public Integer getSenderId() {
-    return userId;
-  }
+  @Column(name = "recommended_user_id")
+  private Integer recommendedUserId;
 
-  public List<Integer> getRecommendedFriendIds() {
-    if (recommendedFriendIds == null) {
-      recommendedFriendIds = new ArrayList<>();  // Null일 경우 빈 리스트로 초기화
-    }
-    return recommendedFriendIds;
-  }
+  @Column(name = "similarity")
+  private Double similarity;
+
+  @Column(name = "similarity_message")
+  private String similarityMessage;
 
   @Override
   public String toString() {
     return "AIRecommendation{" +
         "id=" + id +
         ", userId=" + userId +
-        ", recommendedFriendIds=" + recommendedFriendIds +
+        ", recommendedUserId=" + recommendedUserId +
+        ", similarity=" + similarity +
+        ", similarityMessage='" + similarityMessage + '\'' +
         '}';
+  }
+
+  public AIRecommendation(Integer userId, Integer recommendedUserId, Double similarity,
+      String similarityMessage) {
+    this.userId = userId;
+    this.recommendedUserId = recommendedUserId;
+    this.similarity = similarity;
+    this.similarityMessage = similarityMessage;
   }
 }

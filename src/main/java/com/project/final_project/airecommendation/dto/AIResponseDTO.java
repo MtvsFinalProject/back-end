@@ -12,8 +12,8 @@ public class AIResponseDTO {
   @Getter
   @Setter
   public static class RecommendedUser {
-    private Integer senderId;
-    private String message;
+    private Integer senderId; // 추천된 유저 아이디
+    private String message; // 검사했을 때, 유사했던 메시지
     private Double similarity;  // np.float64는 Java에서 Double로 매핑
 
     @Override
