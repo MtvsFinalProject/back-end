@@ -5,6 +5,8 @@ import com.project.final_project.avatar.dto.AvatarRequestDTO;
 import com.project.final_project.avatar.dto.AvatarResponseDTO;
 import com.project.final_project.avatar.dto.AvatarUpdateDTO;
 import com.project.final_project.avatar.repository.AvatarRepository;
+import com.project.final_project.user.domain.User;
+import com.project.final_project.user.repository.UserRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,18 +17,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class AvatarService {
 
   private final AvatarRepository avatarRepository;
+  private final UserRepository userRepository;
 
   public AvatarResponseDTO registerAvatar(AvatarRequestDTO avatarRequestDTO) {
 
-    Avatar avatar = avatarRepository.getAvatarByUserId(avatarRequestDTO.getUserId())
+    User user = userRepository.findById(avatarRequestDTO.getUserId())
         .orElseThrow(() -> new IllegalArgumentException("not found user id : " + avatarRequestDTO.getUserId()));
 
-    if(avatar != null){
-      throw new IllegalStateException("이미 해당 유저의 아바타 정보가 등록되어있습니다.");
+    Avatar foundAvatar = avatarRepository.getAvatarByUserId(user.getId()).orElse(null);
+
+    if(foundAvatar != null){
+      throw new IllegalStateException("이미 아바타가 존재합니다.");
     }
 
-    avatar = Avatar.builder()
-        .userId(avatarRequestDTO.getUserId())
+    Avatar avatar = Avatar.builder()
+        .userId(user.getId())
         .infoList(avatarRequestDTO.getInfoList())
         .build();
 
@@ -42,10 +47,12 @@ public class AvatarService {
 
   @Transactional
   public AvatarResponseDTO updateAvatar(AvatarUpdateDTO avatarUpdateDTO) {
-    Integer id = avatarUpdateDTO.getUserId();
-    Avatar foundAvatar = avatarRepository.getAvatarByUserId(id)
-        .orElseThrow(() -> new IllegalArgumentException("not found user id : " + id));
+    Avatar foundAvatar = avatarRepository.getAvatarByUserId(avatarUpdateDTO.getUserId())
+        .orElseThrow(
+            () -> new IllegalArgumentException("not found avatar userid : " + avatarUpdateDTO.getUserId())
+        );
     foundAvatar.setInfoList(avatarUpdateDTO.getInfoList());
+//    avatarRepository.save(foundAvatar);
     return new AvatarResponseDTO(foundAvatar.getId(), foundAvatar.getInfoList());
   }
 

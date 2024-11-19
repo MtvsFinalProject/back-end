@@ -2,6 +2,7 @@ package com.project.final_project.common.config;
 
 import com.project.final_project.airecommendation.domain.AIRecommendation;
 import com.project.final_project.airecommendation.dto.AIResponseDTO;
+import com.project.final_project.airecommendation.dto.RecommendResponseDTO;
 import com.project.final_project.airecommendation.service.AIRecommendationService;
 import com.project.final_project.chatlog.domain.ChatLog;
 import java.util.ArrayList;
@@ -20,8 +21,10 @@ import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
+import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,14 +49,14 @@ public class BatchConfig {
   @Bean
   public Job chatLogJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) throws Exception {
     return new JobBuilder("chatLogJob", jobRepository)
-        .start(chatLogStep(jobRepository, transactionManager))  // senderId는 JobParameters에서 처리됨
+        .start(chatLogStep(jobRepository, transactionManager))
         .build();
   }
 
   @Bean
   public Step chatLogStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) throws Exception {
     return new StepBuilder("chatLogStep", jobRepository)
-        .<ChatLog, ChatLog>chunk(10, transactionManager)
+        .<ChatLog, ChatLog>chunk(1000, transactionManager)  // 한 번에 큰 단위로 처리
         .reader(chatLogReader(null))
         .writer(chatLogWriter(null))
         .build();
@@ -61,19 +64,14 @@ public class BatchConfig {
 
   @Bean
   @StepScope
-  public JdbcPagingItemReader<ChatLog> chatLogReader(@Value("#{jobParameters['userId']}") Long userId) throws Exception {
-    MySqlPagingQueryProvider queryProvider = new MySqlPagingQueryProvider();
-    queryProvider.setSelectClause("SELECT id, message, timestamp, sender_id");
-    queryProvider.setFromClause("FROM chat_log");
-    queryProvider.setWhereClause("WHERE sender_id = :senderId");
-    queryProvider.setSortKeys(Collections.singletonMap("id", Order.ASCENDING));
+  public JdbcCursorItemReader<ChatLog> chatLogReader(@Value("#{jobParameters['lastProcessedId']}") Long lastProcessedId) throws Exception {
+    String query = "SELECT id, message, timestamp, sender_id FROM chat_log WHERE id > :lastProcessedId ORDER BY id ASC";
 
-    return new JdbcPagingItemReaderBuilder<ChatLog>()
+    return new JdbcCursorItemReaderBuilder<ChatLog>()
         .dataSource(dataSource)
-        .fetchSize(10)
+        .sql(query)
         .rowMapper(new BeanPropertyRowMapper<>(ChatLog.class))
-        .queryProvider(queryProvider)
-        .parameterValues(Collections.singletonMap("senderId", userId))  // senderId 파라미터 전달
+        .queryArguments(Collections.singletonMap("lastProcessedId", lastProcessedId)) // 오프셋 전달
         .name("chatLogReader")
         .build();
   }
@@ -83,27 +81,32 @@ public class BatchConfig {
   public ItemWriter<ChatLog> chatLogWriter(@Value("#{jobParameters['userId']}") Long userId) {
     return items -> {
       if (!items.isEmpty()) {
-        AIResponseDTO aiResponse = aiService.sendToAI(items, userId); // senderId, message, similarity
+        AIResponseDTO aiResponse = aiService.sendChatLogToAI(items, userId);
+        System.out.println(aiResponse);
 
-        if(aiResponse != null) {
+        if (aiResponse != null) {
           for (AIResponseDTO.RecommendedUser recommendedUser : aiResponse.getRecommended_users()) {
-            // recommendedUser -> senderId, message, similarity
-            if(!aiService.isExistRecommendedUser(userId.intValue(), recommendedUser.getSenderId())){
+            if (!aiService.isExistRecommendedUser(userId.intValue(), recommendedUser.getSenderId())) {
               aiService.saveRecommendation(
                   new AIRecommendation(
                       userId.intValue(),
                       recommendedUser.getSenderId(),
                       recommendedUser.getSimilarity(),
-                      recommendedUser.getMessage()
+                      recommendedUser.getMessage(),
+                      recommendedUser.getInterests()
                   )
               );
+            } else {
+              AIRecommendation recommendation = aiService.getRecommendataionInfo(
+                  userId.intValue(), recommendedUser.getSenderId());
+
+              aiService.updateRecommendation(recommendation.getId(), recommendedUser);
             }
           }
         }
       }
     };
   }
-
 
   @Bean
   public JobOperator jobOperator(JobLauncher jobLauncher, JobRepository jobRepository, JobExplorer jobExplorer, JobRegistry jobRegistry) {
@@ -114,5 +117,4 @@ public class BatchConfig {
     jobOperator.setJobRegistry(jobRegistry);
     return jobOperator;
   }
-
 }
