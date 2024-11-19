@@ -105,4 +105,28 @@ public class User {
   private Integer calculateMaxExpForNextLevel(Integer level) {
     return 100 + (level - 1) * 50;
   }
+
+  @Override
+  public String toString() {
+    return "User{" +
+        "id=" + id +
+        ", socialId='" + socialId + '\'' +
+        ", name='" + name + '\'' +
+        ", grade=" + grade +
+        ", birthday='" + birthday + '\'' +
+        ", gender=" + gender +
+        ", email='" + email + '\'' +
+        ", password='" + password + '\'' +
+        ", phone='" + phone + '\'' +
+        ", level=" + level +
+        ", exp=" + exp +
+        ", maxExp=" + maxExp +
+        ", statusMessage='" + statusMessage + '\'' +
+        ", gold=" + gold +
+        ", interest=" + interest +
+        ", school=" + school +
+        ", isOnline=" + isOnline +
+        ", enteredDate='" + enteredDate + '\'' +
+        '}';
+  }
 }

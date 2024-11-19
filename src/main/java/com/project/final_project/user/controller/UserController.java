@@ -33,15 +33,15 @@ public class UserController {
   private final UserService userService;
   private final ScheduleService scheduleService;
 
-  @GetMapping
-  public UserDTO getUserById(@RequestParam("userId") Integer id) {
-    User user = userService.getUser(id);
+  @GetMapping("/{userId}")
+  public UserDTO getUserById(@PathVariable("userId") Integer userId) {
+    User user = userService.getUser(userId);
     return new UserDTO(user);
   }
 
-  @GetMapping("/email")
-  public UserDTO getUserByEmail(@RequestParam("email") String email){
-    User foundUser = userService.getUserByEmail(email);
+  @GetMapping("/email/{userEmail}")
+  public UserDTO getUserByEmail(@PathVariable("userEmail") String userEmail){
+    User foundUser = userService.getUserByEmail(userEmail);
     return new UserDTO(foundUser);
   }
 

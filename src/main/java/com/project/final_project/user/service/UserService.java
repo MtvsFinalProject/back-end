@@ -1,5 +1,7 @@
 package com.project.final_project.user.service;
 
+import com.project.final_project.airecommendation.dto.UserRecomendByInterestRequestDTO;
+import com.project.final_project.airecommendation.service.AIRecommendationService;
 import com.project.final_project.school.domain.School;
 import com.project.final_project.school.repository.SchoolRepository;
 import com.project.final_project.user.domain.User;
@@ -25,6 +27,7 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final SchoolRepository schoolRepository;
+  private final AIRecommendationService aiRecommendationService;
 
   public User getUser(Integer id) {
     return userRepository.findById(id).orElse(null);
@@ -39,6 +42,9 @@ public class UserService {
   public UserDTO registerUser(UserRegisterDTO dto){
     User newUser = createUser(dto);
     User savedUser = userRepository.save(newUser);
+    if(savedUser.getInterest() != null && !savedUser.getInterest().isEmpty()) {
+      aiRecommendationService.sendInterestToAI(new UserRecomendByInterestRequestDTO(savedUser));
+    }
     return new UserDTO(savedUser);
   }
 
@@ -68,6 +74,7 @@ public class UserService {
     }
     if(dto.getInterest() != null){
       foundUser.setInterest(new ArrayList<>(dto.getInterest()));
+      aiRecommendationService.sendInterestToAI(new UserRecomendByInterestRequestDTO(foundUser));
     }
     if(dto.getStatusMesasge() != null) {
       foundUser.setStatusMessage(dto.getStatusMesasge());
