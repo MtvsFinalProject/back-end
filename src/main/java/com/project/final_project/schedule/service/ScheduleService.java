@@ -55,6 +55,7 @@ public class ScheduleService {
   private Map<String, Set<Integer>> deepCopyMap(Map<String, Set<Integer>> original) {
     Map<String, Set<Integer>> copy = new HashMap<>();
     original.forEach((key, valueSet) -> copy.put(key, new HashSet<>(valueSet)));
+//    System.out.println(original.size() + ", " + copy.size());
     return copy;
   }
 
