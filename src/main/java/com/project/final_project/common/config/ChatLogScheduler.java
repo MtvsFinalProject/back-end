@@ -1,6 +1,5 @@
 package com.project.final_project.common.config;
 
-import com.project.final_project.chatlog.domain.ChatLog;
 import com.project.final_project.user.dto.UserDTO;
 import com.project.final_project.user.service.UserService;
 import java.util.List;
@@ -19,35 +18,29 @@ import org.springframework.scheduling.annotation.Scheduled;
 @EnableScheduling
 @RequiredArgsConstructor
 @Slf4j
-public class SchedulerConfig {
+public class ChatLogScheduler {
 
   private final JobLauncher jobLauncher;
   private final Job chatLogJob;
-  private Long lastProcessedId = 0L; // 오프셋 초기화
+  private final UserService userService;
 
-  @Scheduled(fixedDelay = 60000) // 1분마다 실행
+//  @Scheduled(fixedDelay = 30000)
   public void runChatLogJob() {
-    try {
-      log.info("ChatLog Job 시작 (lastProcessedId = {})", lastProcessedId);
+    List<UserDTO> allUser = userService.getAllUser();  // 모든 유저 조회
 
-      // JobParameters에 lastProcessedId 전달
+    for (UserDTO user : allUser) {
+      Long userId = user.getId().longValue();  // 유저별 senderId 가져오기
+
       JobParameters jobParameters = new JobParametersBuilder()
-          .addLong("lastProcessedId", lastProcessedId) // 오프셋 전달
-          .addLong("time", System.currentTimeMillis()) // 고유 파라미터
+          .addLong("userId", userId)  // JobParameters에 senderId 전달
+          .addLong("time", System.currentTimeMillis())  // 고유한 파라미터
           .toJobParameters();
 
-      // Job 실행
-      JobExecution jobExecution = jobLauncher.run(chatLogJob, jobParameters);
-
-      // 마지막 처리된 ID 업데이트 (JobExecution의 ExitStatus에서 관리 가능)
-      String lastProcessedIdParam = jobExecution.getJobParameters().getString("lastProcessedId");
-      if (lastProcessedIdParam != null) {
-        lastProcessedId = Long.parseLong(lastProcessedIdParam);
-        log.info("ChatLog Job 완료. 업데이트된 lastProcessedId = {}", lastProcessedId);
+      try {
+        jobLauncher.run(chatLogJob, jobParameters);
+      } catch (Exception e) {
+        System.err.println("Job 실행 중 오류 발생: " + e.getMessage());
       }
-
-    } catch (Exception e) {
-      log.error("ChatLog Job 실행 중 오류 발생: ", e);
     }
   }
 }

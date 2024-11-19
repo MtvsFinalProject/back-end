@@ -2,11 +2,11 @@ package com.project.final_project.common.config;
 
 import com.project.final_project.airecommendation.domain.AIRecommendation;
 import com.project.final_project.airecommendation.dto.AIResponseDTO;
-import com.project.final_project.airecommendation.dto.RecommendResponseDTO;
 import com.project.final_project.airecommendation.service.AIRecommendationService;
 import com.project.final_project.chatlog.domain.ChatLog;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -21,10 +21,8 @@ import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
-import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,7 +39,7 @@ import java.util.Set;
 @Configuration
 @EnableBatchProcessing
 @RequiredArgsConstructor
-public class BatchConfig {
+public class ChatLogBatchConfig {
 
   private final DataSource dataSource;
   private final AIRecommendationService aiService;
@@ -49,14 +47,14 @@ public class BatchConfig {
   @Bean
   public Job chatLogJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) throws Exception {
     return new JobBuilder("chatLogJob", jobRepository)
-        .start(chatLogStep(jobRepository, transactionManager))
+        .start(chatLogStep(jobRepository, transactionManager))  // senderId는 JobParameters에서 처리됨
         .build();
   }
 
   @Bean
   public Step chatLogStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) throws Exception {
     return new StepBuilder("chatLogStep", jobRepository)
-        .<ChatLog, ChatLog>chunk(1000, transactionManager)  // 한 번에 큰 단위로 처리
+        .<ChatLog, ChatLog>chunk(10, transactionManager)
         .reader(chatLogReader(null))
         .writer(chatLogWriter(null))
         .build();
@@ -64,14 +62,19 @@ public class BatchConfig {
 
   @Bean
   @StepScope
-  public JdbcCursorItemReader<ChatLog> chatLogReader(@Value("#{jobParameters['lastProcessedId']}") Long lastProcessedId) throws Exception {
-    String query = "SELECT id, message, timestamp, sender_id FROM chat_log WHERE id > :lastProcessedId ORDER BY id ASC";
+  public JdbcPagingItemReader<ChatLog> chatLogReader(@Value("#{jobParameters['userId']}") Long userId) throws Exception {
+    MySqlPagingQueryProvider queryProvider = new MySqlPagingQueryProvider();
+    queryProvider.setSelectClause("SELECT id, message, timestamp, sender_id");
+    queryProvider.setFromClause("FROM chat_log");
+    queryProvider.setWhereClause("WHERE sender_id = :senderId");
+    queryProvider.setSortKeys(Collections.singletonMap("id", Order.ASCENDING));
 
-    return new JdbcCursorItemReaderBuilder<ChatLog>()
+    return new JdbcPagingItemReaderBuilder<ChatLog>()
         .dataSource(dataSource)
-        .sql(query)
+        .fetchSize(10)
         .rowMapper(new BeanPropertyRowMapper<>(ChatLog.class))
-        .queryArguments(Collections.singletonMap("lastProcessedId", lastProcessedId)) // 오프셋 전달
+        .queryProvider(queryProvider)
+        .parameterValues(Collections.singletonMap("senderId", userId))  // senderId 파라미터 전달
         .name("chatLogReader")
         .build();
   }
@@ -81,12 +84,20 @@ public class BatchConfig {
   public ItemWriter<ChatLog> chatLogWriter(@Value("#{jobParameters['userId']}") Long userId) {
     return items -> {
       if (!items.isEmpty()) {
-        AIResponseDTO aiResponse = aiService.sendChatLogToAI(items, userId);
-        System.out.println(aiResponse);
 
-        if (aiResponse != null) {
+        // AI 서버에 전달할 메시지를 단순 문자열 리스트로 변환
+        List<String> messages = items.getItems().stream()
+            .map(ChatLog::getMessage)
+            .collect(Collectors.toList());
+
+        AIResponseDTO aiResponse = aiService.sendChatLogToAI(messages, userId); // 문자열 리스트 전달
+
+
+        if(aiResponse != null) {
+
           for (AIResponseDTO.RecommendedUser recommendedUser : aiResponse.getRecommended_users()) {
-            if (!aiService.isExistRecommendedUser(userId.intValue(), recommendedUser.getSenderId())) {
+            // recommendedUser -> senderId, message, similarity
+            if(!aiService.isExistRecommendedUser(userId.intValue(), recommendedUser.getSenderId())){
               aiService.saveRecommendation(
                   new AIRecommendation(
                       userId.intValue(),
@@ -96,17 +107,15 @@ public class BatchConfig {
                       recommendedUser.getInterests()
                   )
               );
-            } else {
-              AIRecommendation recommendation = aiService.getRecommendataionInfo(
-                  userId.intValue(), recommendedUser.getSenderId());
-
-              aiService.updateRecommendation(recommendation.getId(), recommendedUser);
             }
           }
+
         }
       }
+
     };
   }
+
 
   @Bean
   public JobOperator jobOperator(JobLauncher jobLauncher, JobRepository jobRepository, JobExplorer jobExplorer, JobRegistry jobRegistry) {
@@ -117,4 +126,5 @@ public class BatchConfig {
     jobOperator.setJobRegistry(jobRegistry);
     return jobOperator;
   }
+
 }
