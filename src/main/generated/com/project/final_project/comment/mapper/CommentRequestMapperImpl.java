@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-11-12T22:46:49+0900",
-    comments = "version: 1.5.3.Final, compiler: javac, environment: Java 17.0.12 (Oracle Corporation)"
+    date = "2024-11-19T17:54:35+0900",
+    comments = "version: 1.5.3.Final, compiler: IncrementalProcessingEnvironment from gradle-language-java-8.10.2.jar, environment: Java 17.0.12 (Oracle Corporation)"
 )
 @Component
 public class CommentRequestMapperImpl implements CommentRequestMapper {
@@ -24,6 +24,10 @@ public class CommentRequestMapperImpl implements CommentRequestMapper {
         String content = null;
         String boardType = null;
         Integer boardId = null;
+
+        content = e.getContent();
+        boardType = e.getBoardType();
+        boardId = e.getBoardId();
 
         CommentRequestDTO commentRequestDTO = new CommentRequestDTO( content, boardType, boardId );
 
@@ -39,6 +43,10 @@ public class CommentRequestMapperImpl implements CommentRequestMapper {
         String content = null;
         String boardType = null;
         Integer boardId = null;
+
+        content = d.getContent();
+        boardType = d.getBoardType();
+        boardId = d.getBoardId();
 
         Comment comment = new Comment( content, boardType, boardId );
 

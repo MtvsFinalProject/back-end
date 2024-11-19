@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8080
   servlet:
     encoding:
       charset: UTF-8
@@ -8,9 +8,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/project_final
-    username: root
-    password: 1234
+    url: ${RDS_URL}
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -54,10 +54,10 @@ springdoc:
 
 kakao:
   client:
-    id: 214a201e2f4c682aa352ec136a79189b
-    secret: qlOIf0kweHr54gT7WF92fPnR4VgCX6bc
+    id: ${KAKAO_CLIENT_ID}
+    secret: ${KAKAO_CLIENT_SECRET}
   redirect:
-    url: http://125.132.216.190:5544/login/oauth2/code/kakao
+    url: ${KAKAO_REDIRECT_URL}
 
 
 cloud:
@@ -67,7 +67,7 @@ cloud:
     stack:
       auto: false
     region:
-      static: ap-northeast-2
+      static: ${S3_REGION}
     credentials:
-      access-key: AKIATG6MGVGV5KILEK6H
-      secret-key: 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
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
