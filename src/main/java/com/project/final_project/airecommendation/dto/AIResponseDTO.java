@@ -15,6 +15,7 @@ public class AIResponseDTO {
     private Integer senderId; // 추천된 유저 아이디
     private String message; // 검사했을 때, 유사했던 메시지
     private Double similarity;  // np.float64는 Java에서 Double로 매핑
+    private List<String> interests;
 
     @Override
     public String toString() {
@@ -22,6 +23,7 @@ public class AIResponseDTO {
           "senderId=" + senderId +
           ", message='" + message + '\'' +
           ", similarity=" + similarity +
+          ", interests=" + interests +
           '}';
     }
   }

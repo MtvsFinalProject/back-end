@@ -31,12 +31,6 @@ public class AIRecommendation {
   @Column(name = "user_id")
   private Integer userId;
 
-  // 추천된 친구들의 ID 목록
-//  @ElementCollection
-//  @CollectionTable(name = "recommended_friend_ids",
-//                  joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"))
-//  private List<Integer> recommendedFriendIds = new ArrayList<>();  // 빈 리스트로 초기화
-
   @Column(name = "recommended_user_id")
   private Integer recommendedUserId;
 
@@ -45,6 +39,10 @@ public class AIRecommendation {
 
   @Column(name = "similarity_message")
   private String similarityMessage;
+
+  @ElementCollection
+  @Column(name = "recommended_interests")
+  private List<String> recommendedInterestList;
 
   @Override
   public String toString() {
@@ -58,10 +56,11 @@ public class AIRecommendation {
   }
 
   public AIRecommendation(Integer userId, Integer recommendedUserId, Double similarity,
-      String similarityMessage) {
+      String similarityMessage, List<String> recommendedInterestList) {
     this.userId = userId;
     this.recommendedUserId = recommendedUserId;
     this.similarity = similarity;
     this.similarityMessage = similarityMessage;
+    this.recommendedInterestList = recommendedInterestList;
   }
 }
