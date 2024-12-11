@@ -31,6 +31,8 @@ public class QFurniture extends EntityPathBase<Furniture> {
 
     public final NumberPath<Integer> rot = createNumber("rot", Integer.class);
 
+    public final NumberPath<Integer> userId = createNumber("userId", Integer.class);
+
     public final NumberPath<Integer> x = createNumber("x", Integer.class);
 
     public final NumberPath<Integer> y = createNumber("y", Integer.class);

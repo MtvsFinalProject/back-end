@@ -24,7 +24,11 @@ public class QSchool extends EntityPathBase<School> {
 
     public final NumberPath<Integer> id = createNumber("id", Integer.class);
 
+    public final NumberPath<Double> latitude = createNumber("latitude", Double.class);
+
     public final StringPath location = createString("location");
+
+    public final NumberPath<Double> longitude = createNumber("longitude", Double.class);
 
     public final StringPath schoolName = createString("schoolName");
 
