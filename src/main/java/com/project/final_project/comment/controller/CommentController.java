@@ -5,6 +5,7 @@ import static com.project.final_project.common.global.HttpResponseEntity.success
 import com.project.final_project.comment.domain.Comment;
 import com.project.final_project.comment.dto.CommentRequestDTO;
 import com.project.final_project.comment.dto.CommentResponseDTO;
+import com.project.final_project.comment.dto.CommentUpdateDTO;
 import com.project.final_project.comment.service.CommentService;
 import com.project.final_project.common.global.HttpResponseEntity.ResponseResult;
 import java.util.List;
@@ -29,36 +30,25 @@ public class CommentController {
   private final CommentService commentService;
 
   @PostMapping
-  public ResponseResult<Comment> insert(@RequestParam("boardId") Integer boardId, @RequestBody
-      CommentRequestDTO commentRequestDTO) {
-    
-    //TODO 뭘 return 하는게 좋을지 고민해보자
-    Comment comment = commentService.insertComment(commentRequestDTO);
-    return success(comment);
+  public ResponseResult<CommentResponseDTO> insert(@RequestBody CommentRequestDTO commentRequestDTO) {
+    return success(commentService.insertComment(commentRequestDTO));
   }
 
-  @GetMapping
-  public ResponseResult<List<CommentResponseDTO>> getComments(
-      @RequestParam("boardType") String boardType,
-      @RequestParam("boardId") Integer boardId
-  ) {
-    List<CommentResponseDTO> comments = commentService.findCommentsByBoard(boardType, boardId);
-    return success(comments);
+  @GetMapping("/{boardId}")
+  public List<CommentResponseDTO> getCommentListByBoardId(@PathVariable("boardId") Integer boardId) {
+    return commentService.getCommentListByBoardId(boardId);
   }
 
   @PatchMapping
-  public ResponseResult<Comment> update(
-      @RequestParam("commentId") Integer commentId, @RequestBody CommentRequestDTO commentRequestDTO)  {
-    commentService.update(commentId, commentRequestDTO);
-
-    return success();
+  public ResponseResult<CommentResponseDTO> update(@RequestBody CommentUpdateDTO dto)  {
+    return success(commentService.updateComment(dto));
   }
 
   @DeleteMapping
-  public ResponseResult<Comment> delete(@RequestParam("commentId") Integer commentId) {
-    commentService.delete(commentId);
+  public ResponseResult<String> delete(@RequestParam("commentId") Integer commentId) {
+    commentService.deleteComment(commentId);
 
-    return success();
+    return success("id : " + commentId + " 인 댓글이 삭제되었습니다.");
   }
 
 }

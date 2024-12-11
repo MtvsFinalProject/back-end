@@ -1,7 +1,6 @@
 package com.project.final_project.comment.dto;
 
 import com.project.final_project.comment.domain.Comment;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,14 +8,14 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentRequestDTO {
+public class CommentUpdateDTO {
 
+  private Integer commentId;
   private String content;
-  private Integer boardId;
 
-  public CommentRequestDTO(Comment comment) {
+  public CommentUpdateDTO(Comment comment) {
+    this.commentId = comment.getId();
     this.content = comment.getContent();
-    this.boardId = comment.getBoardId();
   }
 
 }
