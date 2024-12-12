@@ -16,6 +16,7 @@ import com.project.final_project.user.domain.User;
 import com.project.final_project.user.dto.UserDTO;
 import com.project.final_project.user.repository.UserRepository;
 import com.project.final_project.user.service.UserService;
+import com.project.final_project.websocket.service.UserStatusService;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,20 +29,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class SchoolService {
 
   private final SchoolRepository schoolRepository;
-  private final FurnitureService furnitureService;
-  private final FurnitureRepository furnitureRepository;
   private final UserRepository userRepository;
-  private final ScheduleService scheduleService;
-
-  public boolean existSchoolDatas() {
-    return schoolRepository.count() > 0; // 데이터가 있으면 true
-  }
+  private final UserStatusService userStatusService;
 
   public SchoolDTO registerSchool(SchoolRegisterDTO schoolRegisterDTO) {
-    School school = School.builder()
-        .schoolName(schoolRegisterDTO.getSchoolName())
-        .location(schoolRegisterDTO.getLocation())
-        .build();
+    School school = new School(
+        schoolRegisterDTO.getSchoolName(),
+        schoolRegisterDTO.getLocation(),
+        schoolRegisterDTO.getLongitude(),
+        schoolRegisterDTO.getLatitude()
+    );
 
     School savedSchool = schoolRepository.save(school);
 
@@ -75,24 +72,6 @@ public class SchoolService {
         () -> new IllegalArgumentException("not found school id : " + schoolId));
   }
 
-  @Transactional
-  public SchoolDTO addFurnitureToSchool(FurnitureRegisterDTO furnitureRegisterDTO, Integer schoolId) {
-    Integer registeredFurnitureId = furnitureService.registerFurniture(furnitureRegisterDTO);
-
-    School foundSchool = schoolRepository.findById(schoolId).orElseThrow(
-        () -> new IllegalArgumentException("not found school id : " + schoolId));
-
-    List<Furniture> furnitureList = foundSchool.getFurnitureList();
-
-    Furniture foundFurniture = furnitureRepository.findById(registeredFurnitureId).orElseThrow(
-        () -> new IllegalArgumentException("not found furniture id : " + registeredFurnitureId));
-
-    furnitureList.add(foundFurniture);
-    foundSchool.setFurnitureList(furnitureList);
-
-    return new SchoolDTO(foundSchool);
-  }
-
   public List<SchoolDTO> getAllSchool() {
     return schoolRepository.findAll().stream()
         .map(SchoolDTO::new)
@@ -104,6 +83,21 @@ public class SchoolService {
     schoolRepository.deleteById(schoolId);
   }
 
+  @Transactional
+  public void deleteUserInUserList(Integer schoolId, Integer userId) {
+    School school = schoolRepository.findById(schoolId).orElseThrow(
+        () -> new IllegalArgumentException("NOT FOUND School ID : " + schoolId)
+    );
+
+    // UserList에서 userId에 해당하는 유저 제거
+    boolean removed = school.getUserList().removeIf(user -> user.getId().equals(userId));
+
+    if (!removed) {
+      throw new IllegalArgumentException("NOT FOUND User ID : " + userId + " in School ID : " + schoolId);
+    }
+  }
+
+
   public List<SchoolResponseDTO> getSchoolListBySchoolName(String schoolName) {
     return schoolRepository.findBySchoolNameContaining(schoolName)
         .stream()
@@ -111,9 +105,17 @@ public class SchoolService {
             s.getId(),
             s.getSchoolName(),
             s.getLocation(),
-            scheduleService.getUserCountByMap(s.getId(), "School")
+            userStatusService.getUserCountInSchool(s.getId(), "School")
             )
         )
         .toList();
+  }
+
+  public List<School> getSchoolListWithinRadiusBySchoolName(String schoolName, double radius) {
+    return schoolRepository.getSchoolListWithinRadiusBySchoolName(schoolName, radius);
+  }
+
+  public boolean existSchoolDatas() {
+    return !schoolRepository.findAll().isEmpty();
   }
 }

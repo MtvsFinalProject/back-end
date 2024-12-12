@@ -2,124 +2,78 @@ package com.project.final_project.common.init;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.final_project.chatlog.dto.ChatLogRequestDTO;
-import com.project.final_project.chatlog.service.ChatLogService;
-import com.project.final_project.furniture.dto.FurnitureRegisterDTO;
-import com.project.final_project.furniture.service.FurnitureService;
 import com.project.final_project.school.dto.SchoolRegisterDTO;
 import com.project.final_project.school.service.SchoolService;
-import com.project.final_project.user.dto.UserRegisterDTO;
-import com.project.final_project.user.service.UserService;
 import jakarta.annotation.PostConstruct;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
 public class Init {
 
-  private final ChatLogService chatLogService;
-  private final FurnitureService furnitureService;
   private final SchoolService schoolService;
-  private final UserService userService;
 
   @PostConstruct
   public void init() {
+    // 데이터베이스에 학교 데이터가 없으면 초기화 작업 실행
+    if (!schoolService.existSchoolDatas()) {
+      File excelFile = new File("src/main/resources/schools.xlsx");
 
-    // Hibernate 쿼리 로그 비활성화
-    disableHibernateQueryLogging();
-
-    if (!chatLogService.existsChatLogs()) {
-      File file = new File("src/main/resources/chat_dummy1.txt");
-      ObjectMapper objectMapper = new ObjectMapper();
-
-      try {
-        List<ChatLogRequestDTO> chatLogs = objectMapper.readValue(file, new TypeReference<>() {});
-
-        for (ChatLogRequestDTO chatLog : chatLogs) {
-          chatLogService.saveChatLog(chatLog);
-        }
-        System.out.println("채팅 데이터가 성공적으로 저장되었습니다.");
-      } catch (IOException e) {
-        e.printStackTrace();
-      } finally {
-        // Hibernate 쿼리 로그 다시 활성화
-        enableHibernateQueryLogging();
+      if (!excelFile.exists()) {
+        System.out.println("엑셀 파일이 존재하지 않습니다: " + excelFile.getPath());
+        return;
       }
-    }
 
+      try (FileInputStream inputStream = new FileInputStream(excelFile);
+          Workbook workbook = new XSSFWorkbook(inputStream)) {
 
-
-//    if(!furnitureService.existsChatLogs()){
-//      File file = new File("src/main/resources/dummy_furniture_data_30.txt");
-//      ObjectMapper objectMapper = new ObjectMapper();
-//
-//      try {
-//        // 파일에서 JSON 데이터를 읽어와 DTO 리스트로 변환
-//        List<FurnitureRegisterDTO> furnitureData = objectMapper.readValue(file, new TypeReference<>() {});
-//
-//        // 데이터베이스에 저장
-//        for (FurnitureRegisterDTO furniture : furnitureData) {
-//          furnitureService.registerFurniture(furniture);
-//        }
-//        System.out.println("가구 데이터가 성공적으로 저장되었습니다.");
-//      } catch (IOException e) {
-//        e.printStackTrace();
-//      } finally {
-//        // Hibernate 쿼리 로그 다시 활성화
-//        enableHibernateQueryLogging();
-//      }
-//    }
-
-    if(!schoolService.existSchoolDatas()){
-      File file = new File("src/main/resources/dummy_all_school.txt");
-      ObjectMapper objectMapper = new ObjectMapper();
-
-      try {
-        List<SchoolRegisterDTO> schools = objectMapper.readValue(file, new TypeReference<>() {});
-
-        for (SchoolRegisterDTO school : schools) {
-          schoolService.registerSchool(school);
+        // 엑셀 데이터를 읽어서 DTO 리스트로 변환
+        List<SchoolRegisterDTO> schoolData = extractSchoolData(workbook);
+        for (SchoolRegisterDTO school : schoolData) {
+          schoolService.registerSchool(school); // 학교 데이터 등록
         }
 
         System.out.println("학교 데이터가 성공적으로 저장되었습니다.");
+
       } catch (IOException e) {
         e.printStackTrace();
-      } finally {
-        // Hibernate 쿼리 로그 다시 활성화
-        enableHibernateQueryLogging();
       }
+    } else {
+      System.out.println("학교 데이터가 이미 존재합니다. 초기화를 건너뜁니다.");
+    }
+  }
+
+  // 엑셀 데이터를 읽어서 SchoolRegisterDTO 리스트로 변환
+  private List<SchoolRegisterDTO> extractSchoolData(Workbook workbook) {
+    List<SchoolRegisterDTO> schools = new ArrayList<>();
+    Sheet sheet = workbook.getSheetAt(0); // 첫 번째 시트
+
+    for (Row row : sheet) {
+      if (row.getRowNum() == 0) continue; // 헤더 행 건너뛰기
+
+      // 학교명, 소재지지번주소, 위도, 경도 컬럼 읽기
+      String schoolName = row.getCell(1).getStringCellValue();
+      String address = row.getCell(7).getStringCellValue();
+      double latitude = row.getCell(15).getNumericCellValue(); // 위도
+      double longitude = row.getCell(16).getNumericCellValue(); // 경도
+
+      // SchoolRegisterDTO 생성 및 리스트에 추가
+      SchoolRegisterDTO school = new SchoolRegisterDTO(schoolName, address, latitude, longitude);
+      schools.add(school);
     }
 
-
-
-    if(!userService.existUserDatas()){
-      File file = new File("src/main/resources/dummy_users.txt");
-      ObjectMapper objectMapper = new ObjectMapper();
-
-      try {
-        List<UserRegisterDTO> users = objectMapper.readValue(file, new TypeReference<>() {});
-
-        for (UserRegisterDTO user : users) {
-          userService.registerUser(user);
-        }
-
-        System.out.println("유저 데이터가 성공적으로 저장되었습니다.");
-      } catch (IOException e) {
-        e.printStackTrace();
-      } finally {
-        // Hibernate 쿼리 로그 다시 활성화
-        enableHibernateQueryLogging();
-      }
-    }
-
+    return schools;
   }
 
   // Hibernate SQL 로그 비활성화 메서드

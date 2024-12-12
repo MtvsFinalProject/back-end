@@ -12,16 +12,14 @@ import lombok.NoArgsConstructor;
 public class SchoolRegisterDTO {
   String schoolName;
   String location;
+  Double longitude;
+  Double latitude;
   List<User> userList = new ArrayList<>();
 
-  public SchoolRegisterDTO(String schoolName, String location) {
+  public SchoolRegisterDTO(String schoolName, String location, Double longitude, Double latitude) {
     this.schoolName = schoolName;
     this.location = location;
-  }
-
-  public SchoolRegisterDTO(String schoolName, String location, List<User> userList) {
-    this.schoolName = schoolName;
-    this.location = location;
-    this.userList = userList;
+    this.longitude = longitude;
+    this.latitude = latitude;
   }
 }

@@ -23,7 +23,6 @@ import lombok.Setter;
 @Table(name = "school")
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class School {
@@ -38,11 +37,23 @@ public class School {
   @Column(name = "school_location")
   private String location;
 
-  // 각각의 유저에 해당하는 myClassroom을 갖고올 수 있음.
+  @Column(name = "longitude")
+  private Double longitude;
+
+  @Column(name = "latitude")
+  private Double latitude;
+
   @OneToMany(mappedBy = "school", cascade = CascadeType.ALL)
   @JsonIgnore
   private List<User> userList = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL)
   private List<Furniture> furnitureList = new ArrayList<>();
+
+  public School(String schoolName, String location, Double longitude, Double latitude) {
+    this.schoolName = schoolName;
+    this.location = location;
+    this.longitude = longitude;
+    this.latitude = latitude;
+  }
 }

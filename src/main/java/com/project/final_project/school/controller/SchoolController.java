@@ -61,13 +61,22 @@ public class SchoolController {
     return schoolService.getSchoolListBySchoolName(schoolName);
   }
 
+  @GetMapping("/nearby/{schoolName}/{radius}")
+  public List<SchoolDTO> getSchoolListWithinRadiusBySchoolName(
+      @PathVariable("schoolName") String schoolName,
+      @PathVariable("radius") double radius) {
+    List<School> schools = schoolService.getSchoolListWithinRadiusBySchoolName(schoolName, radius);
+    return schools.stream().map(SchoolDTO::new).toList();
+  }
+
   @PostMapping
   public ResponseEntity<SchoolDTO> registerSchool(@RequestBody SchoolRegisterDTO schoolRegisterDTO) {
     return ResponseEntity.ok(schoolService.registerSchool(schoolRegisterDTO));
   }
 
   @PostMapping("/add-user")
-  public ResponseEntity<SchoolDTO> addUserToSchool(@RequestParam("schoolId") Integer schoolId, @RequestParam("userId") Integer userId, @RequestParam("user_grade") Integer gradeId) {
+  public ResponseEntity<SchoolDTO> addUserToSchool(@RequestParam("schoolId") Integer schoolId,
+      @RequestParam("userId") Integer userId, @RequestParam("user_grade") Integer gradeId) {
     return ResponseEntity.ok(schoolService.addUserToSchool(schoolId, userId, gradeId));
   }
 
