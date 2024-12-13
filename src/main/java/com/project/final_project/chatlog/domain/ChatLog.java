@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +26,6 @@ public class ChatLog {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
-
   private Integer senderId;
   private Integer receiverId;
   private String message;
@@ -43,5 +44,10 @@ public class ChatLog {
         ", channel='" + channel + '\'' +
         ", chatType=" + chatType +
         '}';
+  }
+
+  @PrePersist
+  protected void onCreate() {
+    this.timestamp = LocalDateTime.now().toString(); // 현재 시간 저장
   }
 }

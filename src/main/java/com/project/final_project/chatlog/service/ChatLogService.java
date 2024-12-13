@@ -62,4 +62,9 @@ public class ChatLogService {
         )
         .toList();
   }
+
+  @Transactional
+  public void deleteChatLogListByUserId(Integer userId) {
+    chatLogRepository.deleteAll(chatLogRepository.getChatLogsBySenderId(userId));
+  }
 }
