@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class BoardRegisterDTO {
   String title;
   String content;
+  Integer userId;
 }

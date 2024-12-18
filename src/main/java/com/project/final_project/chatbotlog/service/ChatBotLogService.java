@@ -60,7 +60,7 @@ public class ChatBotLogService {
       ObjectMapper objectMapper = new ObjectMapper();
       JsonNode rootNode = objectMapper.readTree(responseEntity.getBody());
 
-      JsonNode npcResponseNode = rootNode.path("npc_response").path("content");
+      JsonNode npcResponseNode = rootNode.path("npc_response");
       aiMessage = npcResponseNode.asText("Error: No content found");
 
       // ChatBotLog 객체 생성 및 저장
@@ -83,5 +83,9 @@ public class ChatBotLogService {
     return chatBotLogRepository.getChatBotLogListByUserId(userId).stream()
         .map(ChatBotLogDTO::new)
         .toList();
+  }
+
+  public void deleteChatBotLogListByUserId(Integer userId) {
+    chatBotLogRepository.deleteAll(chatBotLogRepository.getChatBotLogListByUserId(userId));
   }
 }

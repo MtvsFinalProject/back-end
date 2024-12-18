@@ -30,6 +30,8 @@ public class QMapContest extends EntityPathBase<MapContest> {
 
     public final StringPath previewImageUrl = createString("previewImageUrl");
 
+    public final StringPath publicId = createString("publicId");
+
     public final StringPath title = createString("title");
 
     public final NumberPath<Integer> userId = createNumber("userId", Integer.class);

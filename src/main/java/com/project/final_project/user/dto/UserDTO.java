@@ -1,9 +1,5 @@
 package com.project.final_project.user.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.project.final_project.school.domain.School;
-import com.project.final_project.school.dto.SchoolDTO;
-import com.project.final_project.school.dto.SchoolRegisterDTO;
 import com.project.final_project.school.dto.SchoolResponseDTO;
 import com.project.final_project.user.domain.User;
 import java.util.ArrayList;
@@ -17,7 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserDTO {
   Integer id;
-  String socialId;
   String name;
   Integer grade;
   String birthday;
@@ -29,12 +24,13 @@ public class UserDTO {
   Integer gold;
   List<String> interest = new ArrayList<>();
   Boolean isOnline;
+  Integer mapId;
+  String mapType;
 
   SchoolResponseDTO school;
 
   public UserDTO(User user) {
     this.id = user.getId();
-    this.socialId = user.getSocialId();
     this.name = user.getName();
     this.grade = user.getGrade();
     this.birthday = user.getBirthday();
@@ -42,10 +38,12 @@ public class UserDTO {
     this.email = user.getEmail();
     this.password = user.getPassword();
     this.phone = user.getPhone();
-    this.interest = user.getInterest();
+    this.interest = user.getInterest() != null ? new ArrayList<>(user.getInterest()) : new ArrayList<>();
     this.statusMesasge = user.getStatusMessage();
     this.gold = user.getGold();
     this.isOnline = user.getIsOnline();
     this.school = new SchoolResponseDTO(user.getSchool());
+    this.mapId = user.getMapId();
+    this.mapType = user.getMapType();
   }
 }

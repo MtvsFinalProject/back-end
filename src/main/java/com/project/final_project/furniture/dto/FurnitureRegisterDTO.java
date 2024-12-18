@@ -17,4 +17,5 @@ public class FurnitureRegisterDTO {
   private Boolean flip;
   private Integer mapId;
   private String mapType;
+  private Integer userId;
 }

@@ -3,8 +3,10 @@ package com.project.final_project.mapcontest.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.project.final_project.cloudinary.service.CloudinaryService;
 import com.project.final_project.furniture.repository.FurnitureRepository;
 import com.project.final_project.furniture.service.FurnitureService;
+import com.project.final_project.gallery.domain.Gallery;
 import com.project.final_project.mapcontest.domain.MapContest;
 import com.project.final_project.mapcontest.dto.MapContestDTO;
 import com.project.final_project.mapcontest.dto.MapContestFurnitureVoDTO;
@@ -26,11 +28,7 @@ public class MapContestService {
 
   private final MapContestRepository mapContestRepository;
   private final FurnitureService furnitureService;
-  private final FurnitureRepository furnitureRepository;
-
-  @Value("${cloud.aws.s3.bucket}")
-  private String BUCKET;
-  private final AmazonS3 amazonS3;
+  private final CloudinaryService cloudinaryService;
 
   public MapContestDTO registerMapContest(MapContestRegisterDTO dto) {
 
@@ -48,48 +46,31 @@ public class MapContestService {
         )
         .collect(Collectors.toList());
 
-    MapContest mapContest = MapContest.builder()
-        .userId(dto.getUserId())
-        .title(dto.getTitle())
-        .description(dto.getDescription())
-        .furnitureList(copiedFurnitureList) // 독립된 복사본 사용
-        .previewImageUrl(dto.getPreviewImageUrl())
-        .likeCount(0)
-        .viewCount(0)
-        .build();
+    MapContest mapContest = new MapContest(
+        dto.getUserId(),
+        dto.getTitle(),
+        dto.getDescription(),
+        copiedFurnitureList,
+        dto.getPreviewImageUrl(),
+        0,
+        0,
+        dto.getPublicId()
+    );
 
     MapContest savedMapContest = mapContestRepository.save(mapContest);
 
     return new MapContestDTO(savedMapContest);
   }
 
-  public void upload(MultipartFile file, String fileName) {
-    try {
-      ObjectMetadata metadata = new ObjectMetadata();
-      metadata.setContentType(file.getContentType());
-      metadata.setContentLength(file.getSize());
-      amazonS3.putObject(BUCKET + "/post", fileName, file.getInputStream(), metadata);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public void delete(String fileName) {
-    DeleteObjectRequest request = new DeleteObjectRequest(BUCKET + "/post", fileName);
-    amazonS3.deleteObject(request);
-  }
-
-  public URL getUrl(String fileName) {
-    return amazonS3.getUrl(BUCKET + "/post", fileName);
-  }
-
+  @Transactional
   public void removeMapContest(Integer mapContestId) {
     MapContest foundMapContest = mapContestRepository.findById(mapContestId).orElseThrow(
         () -> new IllegalStateException("not found mapContest id : " + mapContestId));
 
-    // s3에 등록된 이미지 삭제
-    String fileName = String.format("%s_%s", foundMapContest.getUserId(), foundMapContest.getTitle());
-    delete(fileName);
+    // furnitureList 초기화 및 삭제
+    foundMapContest.getFurnitureList().clear();
+
+    cloudinaryDelete(foundMapContest.getPublicId());
 
     mapContestRepository.deleteById(mapContestId);
   }
@@ -159,6 +140,10 @@ public class MapContestService {
       foundMapContest.setFurnitureList(updatedFurnitureList);
     }
 
+    if(dto.getPublicId() != null){
+      foundMapContest.setPublicId(dto.getPublicId());
+    }
+
     // 변경된 엔티티를 저장
     MapContest updatedMapContest = mapContestRepository.save(foundMapContest);
 
@@ -166,4 +151,27 @@ public class MapContestService {
     return new MapContestDTO(updatedMapContest);
   }
 
+  @Transactional
+  public void deleteMapContestListByUserId(Integer userId) {
+    List<MapContest> foundMapContestList = mapContestRepository.getMapContestListByUserId(userId);
+    // furnitureList 초기화 및 삭제
+    foundMapContestList.forEach(m -> {
+      m.getFurnitureList().clear();
+      cloudinaryDelete(m.getPublicId());
+    });
+    mapContestRepository.deleteAll(foundMapContestList);
+  }
+
+  public List<MapContestDTO> getMapContestListByUserId(Integer userId) {
+    return mapContestRepository.getMapContestListByUserId(userId)
+        .stream().map(MapContestDTO::new).toList();
+  }
+
+  public void cloudinaryDelete(String publicId) {
+    try {
+      cloudinaryService.deleteImage(publicId);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }

@@ -25,6 +25,8 @@ public class QGallery extends EntityPathBase<Gallery> {
 
     public final StringPath imgUrl = createString("imgUrl");
 
+    public final StringPath publicId = createString("publicId");
+
     public final NumberPath<Integer> schoolId = createNumber("schoolId", Integer.class);
 
     public final StringPath title = createString("title");

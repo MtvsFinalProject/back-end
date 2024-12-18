@@ -2,10 +2,15 @@ package com.project.final_project.user.controller;
 
 import static com.project.final_project.common.global.HttpResponseEntity.success;
 
+import com.project.final_project.airecommendation.dto.AIResponseDTO;
+import com.project.final_project.airecommendation.dto.UserRecomendByInterestRequestDTO;
+import com.project.final_project.airecommendation.service.AIRecommendationService;
 import com.project.final_project.common.global.HttpResponseEntity.ResponseResult;
 import com.project.final_project.schedule.service.ScheduleService;
 import com.project.final_project.user.domain.User;
 import com.project.final_project.user.dto.UserDTO;
+import com.project.final_project.user.dto.UserPosDTO;
+import com.project.final_project.user.dto.UserPosUpdateDTO;
 import com.project.final_project.user.dto.UserProfileDTO;
 import com.project.final_project.user.dto.UserRegisterDTO;
 import com.project.final_project.user.dto.UserRegisterSchoolDTO;
@@ -32,6 +37,7 @@ public class UserController {
 
   private final UserService userService;
   private final ScheduleService scheduleService;
+  private final AIRecommendationService aiRecommendationService;
 
   @GetMapping("/{userId}")
   public UserDTO getUserById(@PathVariable("userId") Integer userId) {
@@ -49,6 +55,11 @@ public class UserController {
   public ResponseResult<List<UserDTO>> getAllUsers() {
     List<UserDTO> allUser = userService.getAllUser();
     return success(allUser);
+  }
+
+  @GetMapping("/is-exist/{userEmail}")
+  public Boolean isUserExistByUserEmail(@PathVariable("userEmail") String userEmail) {
+    return userService.isUserExistByUserEmail(userEmail);
   }
 
   @PostMapping
@@ -72,6 +83,8 @@ public class UserController {
     return ResponseEntity.noContent().build();
   }
 
+
+
   //== 프로필 ==//
   @GetMapping("/profile/{userId}")
   public ResponseResult<UserProfileDTO> getProfile(@PathVariable("userId") Integer userId) {
@@ -82,5 +95,19 @@ public class UserController {
   public ResponseResult<UserProfileDTO> updateProfile(@RequestBody UserProfileDTO dto) {
     return success(new UserProfileDTO(userService.updateProfile(dto)));
   }
+
+
+
+  //== 유저 맵 이동 시 위치 정보 메소드 ==//
+  @GetMapping("/pos/{userId}")
+  public UserPosDTO getPosition(@PathVariable("userId") Integer userId) {
+    return userService.getPosition(userId);
+  }
+
+  @PatchMapping("/pos")
+  public ResponseResult<UserPosDTO> updatePosition(@RequestBody UserPosUpdateDTO dto) {
+    return userService.updatePosition(dto);
+  }
+
 
 }

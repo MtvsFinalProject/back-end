@@ -70,7 +70,7 @@ public class FurnitureController {
 
   @DeleteMapping("/list/{userId}")
   public ResponseEntity<?> deleteMyClassroomFurnituresByUserId(@PathVariable("userId") Integer userId) {
-    furnitureService.deleteMyClassroomFurnituresByUserId(userId);
+    furnitureService.deleteFurnitureListByUserId(userId);
     return ResponseEntity.noContent().build();
   }
 

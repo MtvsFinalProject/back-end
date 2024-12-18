@@ -1,13 +1,17 @@
 package com.project.final_project.friendship.service;
 
 import com.project.final_project.friendship.domain.Friendship;
+import com.project.final_project.friendship.dto.FriendshipDTO;
+import com.project.final_project.friendship.dto.FriendshipRequestDTO;
 import com.project.final_project.friendship.dto.FriendshipResponseDTO;
+import com.project.final_project.friendship.dto.FriendshipUpdateDTO;
 import com.project.final_project.friendship.repository.FriendshipRepository;
 import com.project.final_project.user.domain.User;
 import com.project.final_project.user.dto.UserDTO;
 import com.project.final_project.user.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,13 +22,21 @@ public class FriendshipService {
     private final FriendshipRepository friendshipRepository;
     private final UserRepository userRepository;
 
-    public void sendFriendRequest(Integer requesterId, Integer receiverId) {
-        User requester = userRepository.findById(requesterId).orElseThrow(() -> new IllegalArgumentException("Requester not found"));
-        User receiver = userRepository.findById(receiverId).orElseThrow(() -> new IllegalArgumentException("Receiver not found"));
+    public Friendship getFriendshipById(Integer friendshipId) {
+        return friendshipRepository.findById(friendshipId).orElseThrow(
+            () -> new IllegalArgumentException("not found friendship id : " + friendshipId));
+    }
 
-        Friendship foundFriendshipByRequesterAndReceiver = findFriendshipByRequesterAndReceiver(requester, receiver);
+    public FriendshipDTO sendFriendRequest(FriendshipRequestDTO dto) {
+        User requester = userRepository.findById(dto.getRequesterId()).orElseThrow(
+            () -> new IllegalArgumentException("Requester not found"));
+        User receiver = userRepository.findById(dto.getReceiverId()).orElseThrow(
+            () -> new IllegalArgumentException("Receiver not found"));
 
-        if(requesterId.equals(receiverId)) {
+        Friendship foundFriendshipByRequesterAndReceiver =
+            findFriendshipByRequesterAndReceiver(requester, receiver);
+
+        if(dto.getRequesterId().equals(dto.getReceiverId())) {
             throw new IllegalStateException("자기 자신한텐 친구 요청이 불가능합니다.");
         }
 
@@ -33,16 +45,17 @@ public class FriendshipService {
                 throw new IllegalStateException("이미 친구 관계 입니다.");
             }
             else {
-                throw new IllegalStateException("이미 친구신청이 되었습니다.");
+                throw new IllegalStateException("이미 친구신청이 되었습니다. id : " + foundFriendshipByRequesterAndReceiver.getId());
             }
         }
 
         Friendship friendship = new Friendship();
-        friendship.setRequesterId(requesterId);
-        friendship.setReceiverId(receiverId);
+        friendship.setRequesterId(dto.getRequesterId());
+        friendship.setReceiverId(dto.getReceiverId());
+        friendship.setMessage(dto.getMessage());
         friendship.setAccepted(false);
 
-        friendshipRepository.save(friendship);
+        return new FriendshipDTO(friendshipRepository.save(friendship));
     }
 
     @Transactional
@@ -81,7 +94,12 @@ public class FriendshipService {
                 User receiver = userRepository.findById(f.getReceiverId()).orElseThrow(
                     () -> new IllegalArgumentException("not found user id : " + f.getReceiverId()));
 
-                return new FriendshipResponseDTO(f.getId(), new UserDTO(requester), new UserDTO(receiver), f.isAccepted());
+                return new FriendshipResponseDTO(
+                    f.getId(),
+                    new UserDTO(requester),
+                    new UserDTO(receiver),
+                    f.getMessage(),
+                    f.isAccepted());
             })
             .toList();
     }
@@ -99,7 +117,12 @@ public class FriendshipService {
                 User receiver = userRepository.findById(receiverId).orElseThrow(
                     () -> new IllegalArgumentException("not found user id : " + receiverId));
 
-                return new FriendshipResponseDTO(f.getId(), new UserDTO(requester), new UserDTO(receiver), f.isAccepted());
+                return new FriendshipResponseDTO(
+                    f.getId(),
+                    new UserDTO(requester),
+                    new UserDTO(receiver),
+                    f.getMessage(),
+                    f.isAccepted());
             })
             .toList();
     }
@@ -113,8 +136,40 @@ public class FriendshipService {
                 User receiver = userRepository.findById(f.getReceiverId()).orElseThrow(
                     () -> new IllegalArgumentException("not found user id : " + f.getReceiverId()));
 
-                return new FriendshipResponseDTO(f.getId(), new UserDTO(requester), new UserDTO(receiver), f.isAccepted());
+                return new FriendshipResponseDTO(
+                    f.getId(),
+                    new UserDTO(requester),
+                    new UserDTO(receiver),
+                    f.getMessage(),
+                    f.isAccepted());
             })
             .toList();
+    }
+
+    public Boolean isFriend(Integer userId1, Integer userId2) {
+        return friendshipRepository.getAllAcceptedFriendships(userId1).stream().anyMatch(
+            friendship -> (friendship.getRequesterId().equals(userId2) ||
+                friendship.getReceiverId().equals(userId2)));
+    }
+
+    @Transactional
+    public FriendshipDTO updateFriendRequestMessage(FriendshipUpdateDTO dto) {
+        Friendship friendship = friendshipRepository.findById(dto.getId()).orElseThrow(
+            () -> new IllegalArgumentException("not found friendship id : " + dto.getId()));
+
+        if(dto.getMessage() != null){
+            friendship.setMessage(dto.getMessage());
+        }
+
+        return new FriendshipDTO(friendship);
+    }
+
+    @Transactional
+    public void deleteFriendshipListByUserId(Integer userId) {
+        // 친구 수락 된 친구 관계 리스트 삭제
+        friendshipRepository.deleteAll(friendshipRepository.getAllAcceptedFriendships(userId));
+
+        // 친구 수락이 안 된 친구 관계 리스트
+        friendshipRepository.deleteAll(friendshipRepository.getAllUnAcceptedFriendships(userId));
     }
 }

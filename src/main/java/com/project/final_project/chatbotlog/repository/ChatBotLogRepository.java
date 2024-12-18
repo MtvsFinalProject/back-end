@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ChatBotLogRepository extends JpaRepository<ChatBotLog, Integer> {
 
-  @Query("select c from ChatBotLog c where c.userId = : userId")
+  @Query("select c from ChatBotLog c where c.userId = :userId")
   List<ChatBotLog> getChatBotLogListByUserId(@Param("userId") Integer userId);
 }

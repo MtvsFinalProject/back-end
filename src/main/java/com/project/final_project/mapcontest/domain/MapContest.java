@@ -27,7 +27,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class MapContest {
 
   @Id
@@ -59,4 +58,19 @@ public class MapContest {
   @Column(name = "view_count")
   private Integer viewCount = 0;
 
+  @Column(name = "public_id")
+  private String publicId;
+
+  public MapContest(Integer userId, String title, String description,
+      List<MapContestFurnitureVoDTO> furnitureList, String previewImageUrl, Integer likeCount,
+      Integer viewCount, String publicId) {
+    this.userId = userId;
+    this.title = title;
+    this.description = description;
+    this.furnitureList = furnitureList;
+    this.previewImageUrl = previewImageUrl;
+    this.likeCount = likeCount;
+    this.viewCount = viewCount;
+    this.publicId = publicId;
+  }
 }

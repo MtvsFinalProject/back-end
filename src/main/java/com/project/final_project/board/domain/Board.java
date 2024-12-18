@@ -32,9 +32,13 @@ public class Board {
   @Column(name = "board_like_count")
   Integer likeCount = 0;
 
-  public Board(String title, String content) {
+  @Column(name = "user_id")
+  Integer userId;
+
+  public Board(String title, String content, Integer userId) {
     this.title = title;
     this.content = content;
     this.likeCount = 0;
+    this.userId = userId;
   }
 }

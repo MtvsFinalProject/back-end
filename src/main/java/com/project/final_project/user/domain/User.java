@@ -2,7 +2,10 @@ package com.project.final_project.user.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.project.final_project.guestbook.domain.GuestBook;
+import com.project.final_project.quest.domain.UserQuest;
 import com.project.final_project.school.domain.School;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -12,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +37,6 @@ public class User {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "user_id")
   Integer id;
-
-  @Column(name = "user_social_id")
-  String socialId; // 소셜 로그인에서 제공한 고유 ID 저장
 
   @Column(name = "user_name")
   String name;
@@ -73,7 +74,7 @@ public class User {
   @Column(name ="user_gold")
   Integer gold;
 
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.EAGER)
   @Column(name = "interest")
   List<String> interest = new ArrayList<>();
 
@@ -87,6 +88,20 @@ public class User {
 
   @Column(name = "entered_date")
   String enteredDate;
+
+  @Column(name = "map_id")
+  Integer mapId;
+
+  @Column(name = "map_type")
+  String mapType;
+
+  @JsonIgnore
+  @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  private List<UserQuest> userQuests;
+
+  @JsonIgnore
+  @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  private List<GuestBook> guestBooks;
 
   //==비즈니스 로직==//
   public void gainExp(Integer exp) {
@@ -106,27 +121,5 @@ public class User {
     return 100 + (level - 1) * 50;
   }
 
-  @Override
-  public String toString() {
-    return "User{" +
-        "id=" + id +
-        ", socialId='" + socialId + '\'' +
-        ", name='" + name + '\'' +
-        ", grade=" + grade +
-        ", birthday='" + birthday + '\'' +
-        ", gender=" + gender +
-        ", email='" + email + '\'' +
-        ", password='" + password + '\'' +
-        ", phone='" + phone + '\'' +
-        ", level=" + level +
-        ", exp=" + exp +
-        ", maxExp=" + maxExp +
-        ", statusMessage='" + statusMessage + '\'' +
-        ", gold=" + gold +
-        ", interest=" + interest +
-        ", school=" + school +
-        ", isOnline=" + isOnline +
-        ", enteredDate='" + enteredDate + '\'' +
-        '}';
-  }
+
 }

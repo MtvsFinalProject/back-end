@@ -7,6 +7,7 @@ import com.project.final_project.guestbook.repository.GuestBookRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,5 +26,10 @@ public class GuestBookService {
 
   public List<GuestBookDTO> getGuestBookListByMapTypeAndMapId(String mapType, Integer mapId) {
     return guestBookRepository.getGuestBookListByMapTypeAndMapId(mapType, mapId).stream().map(GuestBookDTO::new).toList();
+  }
+
+  @Transactional
+  public void deleteGuestBookListByUserId(Integer userId) {
+    guestBookRepository.deleteAll(guestBookRepository.getGuestBookListByUserId(userId));
   }
 }

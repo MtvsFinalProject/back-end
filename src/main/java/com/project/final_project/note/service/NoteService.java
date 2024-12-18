@@ -7,6 +7,7 @@ import com.project.final_project.note.repository.NoteRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,5 +26,10 @@ public class NoteService {
 
   public void removeNote(Integer noteId) {
     noteRepository.deleteById(noteId);
+  }
+
+  @Transactional
+  public void deleteNoteListByUserId(Integer userId) {
+    noteRepository.deleteAll(noteRepository.getNoteListByUserId(userId));
   }
 }

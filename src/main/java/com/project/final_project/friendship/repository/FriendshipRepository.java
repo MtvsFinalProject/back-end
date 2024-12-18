@@ -18,10 +18,9 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Integer>
     @Query("select f from Friendship f where f.requesterId = :requesterId and f.receiverId = :receiverId")
     Friendship findByRequesterIdAndReceiverId(@Param("requesterId") Integer requesterId, @Param("receiverId") Integer receiverId);
 
-    @Modifying
-    @Query("delete from Friendship f where f.requesterId = :requesterId and f.receiverId = :receiverId")
-    void deleteByRequesterIdAndReceiverId(@Param("requesterId") Integer requesterId, @Param("receiverId") Integer receiverId);
-
     @Query("select f from Friendship f where (f.requesterId = :userId or f.receiverId = :userId) and f.isAccepted = true ")
     List<Friendship> getAllAcceptedFriendships(@Param("userId") Integer userId);
+
+    @Query("select f from Friendship f where (f.requesterId = :userId or f.receiverId = :userId) and f.isAccepted = false ")
+    List<Friendship> getAllUnAcceptedFriendships(@Param("userId") Integer userId);
 }

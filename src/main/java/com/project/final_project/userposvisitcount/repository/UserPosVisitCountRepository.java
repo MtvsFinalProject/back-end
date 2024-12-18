@@ -1,6 +1,7 @@
 package com.project.final_project.userposvisitcount.repository;
 
 import com.project.final_project.userposvisitcount.domain.UserPosVisitCount;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +16,7 @@ public interface UserPosVisitCountRepository extends JpaRepository<UserPosVisitC
   UserPosVisitCount getUserPosVisitCountByMapIdAndMapTypeAndUserId(
       @Param("mapType") String mapType,
       @Param("userId") int userId);
+
+  @Query("select upvc from UserPosVisitCount upvc where upvc.userId = :userId")
+  List<UserPosVisitCount> getUserPosVisitCountListByUserId(@Param("userId") Integer userId);
 }

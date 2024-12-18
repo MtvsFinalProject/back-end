@@ -23,13 +23,6 @@ public class UserProfileDTO {
     this.statusMessage = user.getStatusMessage();
   }
 
-  public UserProfileDTO(UserDTO dto){
-    this.id = dto.getId();
-    this.name = dto.getName();
-    this.interest = dto.getInterest();
-    this.statusMessage = dto.getStatusMesasge();
-  }
-
   public UserProfileDTO(UserProfileDTO dto){
     this.id = dto.getId();
     this.name = dto.getName();

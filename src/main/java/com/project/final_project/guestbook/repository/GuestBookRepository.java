@@ -13,4 +13,7 @@ public interface GuestBookRepository extends JpaRepository<GuestBook, Integer> {
 
   @Query("select gb from GuestBook gb where gb.mapType = :mapType and gb.mapId = :mapId")
   List<GuestBook> getGuestBookListByMapTypeAndMapId(@Param("mapType") String mapType, @Param("mapId") Integer mapId);
+
+  @Query("select gb from GuestBook gb where gb.user.id = :userId")
+  List<GuestBook> getGuestBookListByUserId(@Param("userId") Integer userId);
 }

@@ -56,7 +56,18 @@ public class AvatarService {
     return new AvatarResponseDTO(foundAvatar.getId(), foundAvatar.getInfoList());
   }
 
+  @Transactional
   public void deleteAvatar(Integer userId) {
-    avatarRepository.deleteAvatarByUserId(userId);
+
+    Avatar avatar = avatarRepository.getAvatarByUserId(userId).orElseThrow(
+        () -> new IllegalArgumentException("not found avartar userid : " + userId));
+
+    avatar.getInfoList().clear();
+
+    avatarRepository.delete(avatar);
+  }
+
+  public boolean isExistAvatar(Integer userId) {
+    return avatarRepository.getAvatarByUserId(userId).isPresent();
   }
 }

@@ -14,12 +14,14 @@ public class FriendshipDTO {
   private Integer id;
   private Integer requesterId;
   private Integer receiverId;
+  private String message;
   private boolean isAccepted;
 
-  public FriendshipDTO(Friendship friendship) {
+  public FriendshipDTO(Friendship friendship){
     this.id = friendship.getId();
-    this.requesterId = friendship.getRequesterId();
     this.receiverId = friendship.getReceiverId();
+    this.requesterId = friendship.getRequesterId();
+    this.message = friendship.getMessage();
     this.isAccepted = friendship.isAccepted();
   }
 }

@@ -4,6 +4,7 @@ import static com.project.final_project.common.global.HttpResponseEntity.success
 
 import com.project.final_project.common.global.HttpResponseEntity.ResponseResult;
 import com.project.final_project.item.dto.ItemDTO;
+import com.project.final_project.item.dto.ItemRegisterDTO;
 import com.project.final_project.item.service.ItemService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -26,21 +27,23 @@ public class ItemController {
   private final ItemService itemService;
 
   @PostMapping
-  public ResponseResult<ItemDTO> registerItem(@RequestBody ItemDTO dto){
+  public ResponseResult<ItemDTO> registerItem(@RequestBody ItemRegisterDTO dto){
     return success(itemService.registerItem(dto));
   }
 
-  @GetMapping("/list/{userId}")
-  public List<ItemDTO> getItemListByUserId(@PathVariable("userId") Integer userId){
-    return itemService.getItemListByUserId(userId);
+  @GetMapping("/{itemId}")
+  public ItemDTO getItemByItemId(@PathVariable("itemId") Integer itemId) {
+    return itemService.getItemByItemId(itemId);
   }
 
-  @GetMapping("/list/{userId}/{itemType}")
-  public List<ItemDTO> getItemListByUserIdAndItemType(
-      @PathVariable("userId") Integer userId,
-      @PathVariable("itemType") String itemType
-  ) {
-    return itemService.getItemListByUserIdAndItemType(userId, itemType);
+  @GetMapping("/list")
+  public List<ItemDTO> getAllItem() {
+    return itemService.getAllItem();
+  }
+
+  @GetMapping("/list/{itemType}")
+  public List<ItemDTO> getItemListByItemType(@PathVariable("itemType") String itemType) {
+    return itemService.getItemListByItemType(itemType);
   }
 
   @PatchMapping

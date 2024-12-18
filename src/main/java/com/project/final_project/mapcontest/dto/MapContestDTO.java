@@ -19,6 +19,7 @@ public class MapContestDTO {
   private Integer likeCount = 0;
   private Integer viewCount = 0;
   private Integer userId;
+  private String publicId;
 
   public MapContestDTO(MapContest m){
     this.id = m.getId();
@@ -29,5 +30,6 @@ public class MapContestDTO {
     this.likeCount = m.getLikeCount();
     this.viewCount = m.getViewCount();
     this.userId = m.getUserId();
+    this.publicId = m.getPublicId();
   }
 }

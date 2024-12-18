@@ -48,6 +48,9 @@ public class Furniture {
   @Column(name = "map_type")
   private String mapType;
 
+  @Column(name = "user_id")
+  private Integer userId;
+
   // 복사 생성자 (다른 Furniture 객체를 사용)
   public Furniture(Furniture other) {
     this.objId = other.objId;

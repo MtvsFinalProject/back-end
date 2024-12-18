@@ -5,6 +5,7 @@ import com.project.final_project.common.util.QueryParamUtil;
 import com.project.final_project.friendship.domain.Friendship;
 import com.project.final_project.friendship.dto.FriendshipRequestDTO;
 import com.project.final_project.friendship.dto.FriendshipResponseDTO;
+import com.project.final_project.friendship.repository.FriendshipRepository;
 import com.project.final_project.friendship.service.FriendshipService;
 import com.project.final_project.user.dto.UserPosDTO;
 import com.project.final_project.user.dto.UserPosUpdateDTO;
@@ -103,6 +104,10 @@ public class UserStatusWebSocketHandler extends TextWebSocketHandler {
 
     userService.updatePosition(new UserPosUpdateDTO(userId, mapId, mapType));
 
+    String userStatusJsonResponse = jacksonObjectMapper.writeValueAsString(messageMap);
+    userStatusService.updateUserStatus(userId, userStatusJsonResponse);
+
+
     Map<String, Object> friendsResponse = new HashMap<>();
     friendsResponse.put("type", "ACCEPT_FRIEND_POS_INFO");
     friendsResponse.put("userId", userId);
@@ -138,10 +143,16 @@ public class UserStatusWebSocketHandler extends TextWebSocketHandler {
     receiver_response.put("message", "아이디 : " + friendshipId + " 인 친구 관계가 삭제되었습니다");
 
     String requester_jsonResponse = jacksonObjectMapper.writeValueAsString(requester_response);
-    UserSessionManager.getSession(friendship.getRequesterId()).sendMessage(new TextMessage(requester_jsonResponse));
+    WebSocketSession requesterSession = UserSessionManager.getSession(friendship.getRequesterId());
+    if(requesterSession != null) {
+      requesterSession.sendMessage(new TextMessage(requester_jsonResponse));
+    }
 
     String receiver_jsonResponse = jacksonObjectMapper.writeValueAsString(receiver_response);
-    UserSessionManager.getSession(friendship.getReceiverId()).sendMessage(new TextMessage(receiver_jsonResponse));
+    WebSocketSession receiverSession = UserSessionManager.getSession(friendship.getReceiverId());
+    if(receiverSession != null) {
+      receiverSession.sendMessage(new TextMessage(receiver_jsonResponse));
+    }
   }
 
   private void handleFetchPendingRequestsByRequester(WebSocketSession session, Map<String, Object> messageMap)
@@ -174,10 +185,16 @@ public class UserStatusWebSocketHandler extends TextWebSocketHandler {
     receiver_response.put("message", "아이디 : " + friendshipId + " 인 친구 요청이 삭제되었습니다");
 
     String requester_jsonResponse = jacksonObjectMapper.writeValueAsString(requester_response);
-    UserSessionManager.getSession(friendship.getRequesterId()).sendMessage(new TextMessage(requester_jsonResponse));
+    WebSocketSession requesterSession = UserSessionManager.getSession(friendship.getRequesterId());
+    if(requesterSession != null) {
+      requesterSession.sendMessage(new TextMessage(requester_jsonResponse));
+    }
 
     String receiver_jsonResponse = jacksonObjectMapper.writeValueAsString(receiver_response);
-    UserSessionManager.getSession(friendship.getReceiverId()).sendMessage(new TextMessage(receiver_jsonResponse));
+    WebSocketSession receiverSession = UserSessionManager.getSession(friendship.getReceiverId());
+    if(receiverSession != null) {
+      receiverSession.sendMessage(new TextMessage(receiver_jsonResponse));
+    }
   }
 
 
@@ -222,12 +239,19 @@ public class UserStatusWebSocketHandler extends TextWebSocketHandler {
   //== 친구 요청 거절 ==//
   private void handleFriendReject(Map<String, Object> messageMap) throws Exception {
     Integer friendshipId = (Integer) messageMap.get("friendshipId");
+    Friendship friendship = friendshipService.getFriendshipById(friendshipId);
     friendshipService.removeFriendship(friendshipId);
 
     // 알림 전송
-    WebSocketSession requesterSession = UserSessionManager.getSession(friendshipId);
+    WebSocketSession requesterSession = UserSessionManager.getSession(friendship.getRequesterId());
     if (requesterSession != null) {
       requesterSession.sendMessage(new TextMessage("친구 요청이 거절되었습니다."));
+    }
+
+    // 알림 전송
+    WebSocketSession receiverSession = UserSessionManager.getSession(friendship.getReceiverId());
+    if (receiverSession != null) {
+      receiverSession.sendMessage(new TextMessage("친구 요청이 거절되었습니다."));
     }
   }
 
@@ -332,13 +356,12 @@ public class UserStatusWebSocketHandler extends TextWebSocketHandler {
         // JSON 문자열 생성
         String jsonResponse = jacksonObjectMapper.writeValueAsString(statusUpdate);
 
-        System.out.println(jsonResponse);
-
         // 사용자 상태 업데이트
         userStatusService.updateUserStatus(userId, jsonResponse);
 
         // 사용자 상태를 데이터베이스에 반영
         userService.setUserStatusToOnline(userId);
+        userService.updatePosition(new UserPosUpdateDTO(userId, mapId, mapType));
 
         // 연결된 모든 유저에게 상태 변경 브로드캐스트
         broadcastUserStatuses(userId);

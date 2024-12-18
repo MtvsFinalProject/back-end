@@ -15,8 +15,4 @@ public interface AvatarRepository extends JpaRepository<Avatar, Integer> {
   @Query("select a from Avatar a where a.userId = :userId")
   Optional<Avatar> getAvatarByUserId(@Param("userId") Integer userId);
 
-  @Modifying
-  @Transactional
-  @Query("delete from Avatar a where a.userId = :userId")
-  void deleteAvatarByUserId(@Param("userId") Integer userId);
 }

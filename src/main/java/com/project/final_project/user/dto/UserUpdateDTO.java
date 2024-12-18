@@ -14,7 +14,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserUpdateDTO {
   Integer id;
-  String socialId;
   String name;
   Integer grade;
   String birthday;

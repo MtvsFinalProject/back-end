@@ -24,12 +24,13 @@ public class BoardService {
   private final BoardLikeService boardLikeService;
 
   public BoardDTO registerBoard(BoardRegisterDTO dto) {
-    Board board = new Board(dto.getTitle(), dto.getContent());
+    Board board = new Board(dto.getTitle(), dto.getContent(), dto.getUserId());
     return new BoardDTO(boardRepository.save(board), 0);
   }
 
+
   public List<BoardListResponseDTO> getBoardListByUserId(Integer userId) {
-    return boardRepository.findAll()
+    return boardRepository.getBoardListByUserId(userId)
         .stream().map(b -> new BoardListResponseDTO(
             b,
             commentService.getCommentCountByBoardId(b.getId()),
@@ -45,6 +46,7 @@ public class BoardService {
         () -> new IllegalStateException("not found board id : " + boardId));
     return new BoardDTO(board, commentService.getCommentCountByBoardId(board.getId()));
   }
+
 
   @Transactional
   public BoardDTO updateBoard(BoardUpdateDTO dto) {
@@ -67,7 +69,30 @@ public class BoardService {
   }
 
 
+  @Transactional
   public void deleteBoard(Integer boardId) {
     boardRepository.deleteById(boardId);
+  }
+
+
+  @Transactional
+  public void deleteBoardListByUserId(Integer userId) {
+    List<Board> boardList = boardRepository.getBoardListByUserId(userId);
+    boardList.forEach(b -> {
+      commentService.deleteCommentListByBoardId(b.getId());
+      boardRepository.delete(b);
+    });
+  }
+
+
+  public List<BoardListResponseDTO> getAllBoards(Integer userId) {
+    return boardRepository.findAll()
+        .stream().map(b -> new BoardListResponseDTO(
+                b,
+                commentService.getCommentCountByBoardId(b.getId()),
+                boardLikeService.isExistLike(new BoardGetLikeDTO(b.getId(), userId))
+            )
+        )
+        .toList();
   }
 }

@@ -2,6 +2,8 @@ package com.project.final_project.mapcontest.controller;
 
 import static com.project.final_project.common.global.HttpResponseEntity.success;
 
+import com.project.final_project.cloudinary.dto.CloudinaryResponseDTO;
+import com.project.final_project.cloudinary.service.CloudinaryService;
 import com.project.final_project.common.global.HttpResponseEntity.ResponseResult;
 import com.project.final_project.furniture.dto.FurnitureDTO;
 import com.project.final_project.mapcontest.dto.MapContestDTO;
@@ -10,8 +12,10 @@ import com.project.final_project.mapcontest.dto.MapContestRegisterDTO;
 import com.project.final_project.mapcontest.service.MapContestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,45 +39,26 @@ import org.springframework.web.multipart.MultipartFile;
 public class MapContestController {
 
   private final MapContestService mapContestService;
+  private final CloudinaryService cloudinaryService;
 
-  /**
-   * 이미지 업로드
-   * @param file 업로드할 이미지 파일
-   * @return 성공 메시지와 HTTP 상태 코드
-   */
 
+  //== cloudinary ==//
+  // 이미지 업로드
   @PostMapping(
       value = "/upload-image",
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE
   )
-  public ResponseEntity<String> uploadImage(@RequestPart("file") @Parameter(description = "업로드할 파일") MultipartFile file) {
-
-    if (file.isEmpty()) {
-      return ResponseEntity.badRequest().body("파일이 비어있습니다.");
-    }
-
+  public ResponseEntity<?> uploadCloudinaryImage(
+      @RequestPart("file")
+      @Parameter(description = "업로드할 파일 - cloudinary 버전") MultipartFile file) {
     try {
-      // 원본 파일의 확장자를 추출
-      String originalFileName = file.getOriginalFilename();
-      String extension = "";
-
-      if (originalFileName != null && originalFileName.contains(".")) {
-        extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-      }
-
-      // UUID를 사용하여 랜덤 파일명 생성
-      String randomFileName = UUID.randomUUID().toString() + extension;
-
-      // 파일을 S3에 업로드
-      mapContestService.upload(file, randomFileName);
-
-      URL url = mapContestService.getUrl(randomFileName);
-
-      return ResponseEntity.status(HttpStatus.OK).body("Image uploaded successfully with name: " + url);
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body("Failed to upload image: " + e.getMessage());
+      Map<String, Object> uploadResult = cloudinaryService.uploadImage(file);
+      return ResponseEntity.ok(
+          new CloudinaryResponseDTO(
+              (String)uploadResult.get("url"), (String)uploadResult.get("public_id")));
+    } catch (IOException e) {
+      return ResponseEntity.status(500).body(Map.of("error", "Image upload failed"));
     }
   }
 

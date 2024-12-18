@@ -6,13 +6,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name="friendship")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Friendship {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,15 +28,10 @@ public class Friendship {
     @Column(name = "receiver_id")
     private Integer receiverId;
 
-    private boolean isAccepted;
+    @Column(name = "request_message")
+    private String message;
 
-    public Friendship() {}
-
-    public Friendship(Integer requesterId, Integer receiverId, boolean isAccepted) {
-        this.requesterId = requesterId;
-        this.receiverId = receiverId;
-        this.isAccepted = isAccepted;
-    }
+    private boolean isAccepted = false;
 
     @Override
     public String toString() {

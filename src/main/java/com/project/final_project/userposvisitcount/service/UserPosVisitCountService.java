@@ -43,4 +43,10 @@ public class UserPosVisitCountService {
 
     return new UserPosVisitCountDTO(userPosVisitCount);
   }
+
+  @Transactional
+  public void deleteUserPosVisitCountListByUserId(Integer userId) {
+    userPosVisitCountRepository.deleteAll(
+        userPosVisitCountRepository.getUserPosVisitCountListByUserId(userId));
+  }
 }

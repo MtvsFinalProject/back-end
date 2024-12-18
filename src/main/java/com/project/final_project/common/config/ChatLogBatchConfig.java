@@ -4,10 +4,8 @@ import com.project.final_project.airecommendation.dto.AIResponseDTO;
 import com.project.final_project.airecommendation.service.AIRecommendationService;
 import com.project.final_project.chatlog.domain.ChatLog;
 import com.project.final_project.chatlog.dto.ChatLogDTO;
-import com.project.final_project.emotionanalysis.dto.EmotionAnalysisRequestDTO;
 import com.project.final_project.emotionanalysis.dto.EmotionAnalysisResponseDTO;
-import com.project.final_project.emotionanalysis.service.EmotionService;
-import java.util.HashMap;
+import com.project.final_project.emotionanalysis.service.EmotionAnalysisService;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +46,7 @@ public class ChatLogBatchConfig {
 
   private final DataSource dataSource;
   private final AIRecommendationService aiRecommendationService;
-  private final EmotionService emotionService;
+  private final EmotionAnalysisService emotionAnalysisSerivce;
 
   @Bean
   public Job chatLogJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) throws Exception {
@@ -118,7 +116,7 @@ public class ChatLogBatchConfig {
 
       // 감성 분석 처리
       EmotionAnalysisResponseDTO emotionAnalysisResponse =
-          emotionService.RequestEmotionAnalysis(userId.intValue());
+          emotionAnalysisSerivce.RequestEmotionAnalysis(userId.intValue());
       System.out.println("emotionAnalysisResponse = " + emotionAnalysisResponse);
 
       if (recommendation != null) {

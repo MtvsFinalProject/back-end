@@ -3,18 +3,27 @@ package com.project.final_project.friendship.controller;
 import static com.project.final_project.common.global.HttpResponseEntity.success;
 
 import com.project.final_project.common.global.HttpResponseEntity.ResponseResult;
+import com.project.final_project.friendship.domain.Friendship;
+import com.project.final_project.friendship.dto.FriendshipDTO;
+import com.project.final_project.friendship.dto.FriendshipRequestDTO;
 import com.project.final_project.friendship.dto.FriendshipResponseDTO;
+import com.project.final_project.friendship.dto.FriendshipUpdateDTO;
 import com.project.final_project.friendship.service.FriendshipService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,9 +59,8 @@ public class FriendshipController {
         @ApiResponse(responseCode = "409", description = "이미 친구 요청이 존재합니다.")
     })
     @PostMapping("/request")
-    public ResponseEntity<String> sendFriendRequest(@RequestParam("requesterId") Integer requesterId, @RequestParam("receiverId") Integer receiverId) {
-        friendshipService.sendFriendRequest(requesterId, receiverId);
-        return ResponseEntity.ok("친구 요청을 보냈습니다.");
+    public ResponseResult<FriendshipDTO> sendFriendRequest(@RequestBody FriendshipRequestDTO dto) {
+        return success(friendshipService.sendFriendRequest(dto));
     }
 
     @Operation(summary = "친구 요청 수락", description = "특정 친구 요청을 수락합니다.")
@@ -74,6 +82,11 @@ public class FriendshipController {
     public ResponseEntity<String> cancelFriendRequest(@RequestParam("friendshipId") Integer friendshipId){
         friendshipService.removeFriendship(friendshipId);
         return ResponseEntity.ok("친구 요청을 취소했습니다.");
+    }
+
+    @PatchMapping("/message")
+    public ResponseResult<FriendshipDTO> updateFriendRequestMessage(@RequestBody FriendshipUpdateDTO dto){
+        return success(friendshipService.updateFriendRequestMessage(dto));
     }
 
     @Operation(summary = "친구 삭제", description = "친구 관계를 삭제합니다.")

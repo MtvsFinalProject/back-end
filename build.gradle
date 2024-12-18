@@ -30,6 +30,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-web-services'
+
+    // Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar
+    // from classpath in order to avoid potential conflicts
+    // 에러 제거
+    configurations.all {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+
 
     // AWS
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
@@ -46,8 +55,8 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     // MapStruct
-    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+//    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+//    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 
     // MySQL
     runtimeOnly 'mysql:mysql-connector-java:8.0.32'
@@ -67,6 +76,21 @@ dependencies {
 
     // dotenv-java 라이브러리
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+
+    // Spring WebSocket 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // WebSocket 서버를 위한 Spring Boot Starter
+    implementation 'org.springframework.boot:spring-boot-starter'
+
+    implementation 'org.apache.poi:poi:5.2.3'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+
+    // Cloudinary Java SDK
+    implementation 'com.cloudinary:cloudinary-core:1.29.0'
+    implementation 'com.cloudinary:cloudinary-http44:1.29.0' // HTTP 어댑터 추가
+
+    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 
 }
 

@@ -46,6 +46,7 @@ public class FurnitureService {
         .flip(furnitureRegisterDTO.getFlip())
         .mapId(furnitureRegisterDTO.getMapId())
         .mapType(furnitureRegisterDTO.getMapType())
+        .userId(furnitureRegisterDTO.getUserId())
         .build();
     Furniture savedFurniture = furnitureRepository.save(newFurniture);
     return savedFurniture.getId();
@@ -139,8 +140,7 @@ public class FurnitureService {
     return res;
   }
 
-  public void deleteMyClassroomFurnituresByUserId(Integer userId) {
-    List<Furniture> furnitureList = furnitureRepository.getFurnitureListByUserId(userId);
-    furnitureRepository.deleteAll(furnitureList);
+  public void deleteFurnitureListByUserId(Integer userId) {
+    furnitureRepository.deleteAll(furnitureRepository.getFurnitureListByUserId(userId));
   }
 }

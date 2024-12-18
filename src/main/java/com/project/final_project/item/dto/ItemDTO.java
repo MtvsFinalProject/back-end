@@ -10,17 +10,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ItemDTO {
   private Integer id;
+  private Integer itemIdx;
   private String itemName;
-  private Integer count;
   private Integer price;
-  private Integer userId;
   private String itemType;
 
   public ItemDTO(Item item) {
+    this.id = item.getId();
+    this.itemIdx = item.getItemIdx();
     this.itemName = item.getItemName();
-    this.count = item.getCount();
     this.price = item.getPrice();
-    this.userId = item.getUserId();
     this.itemType = item.getItemType();
   }
+
 }

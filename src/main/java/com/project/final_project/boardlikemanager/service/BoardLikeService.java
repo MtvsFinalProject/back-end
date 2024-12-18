@@ -9,6 +9,7 @@ import com.project.final_project.boardlikemanager.dto.BoardRemoveLikeDTO;
 import com.project.final_project.boardlikemanager.repository.BoardLikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -57,4 +58,8 @@ public class BoardLikeService {
     boardLikeRepository.delete(bl);
   }
 
+  @Transactional
+  public void deleteBoardLikeListByUserId(Integer userId) {
+    boardLikeRepository.deleteAll(boardLikeRepository.getBoardLikeByUserId(userId));
+  }
 }

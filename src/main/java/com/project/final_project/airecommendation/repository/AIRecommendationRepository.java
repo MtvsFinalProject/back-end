@@ -23,9 +23,9 @@ public interface AIRecommendationRepository extends JpaRepository<AIRecommendati
   @Query("select r from AIRecommendation r where r.userId = :userId")
   List<AIRecommendation> findAIRecommendationListByUserId(@Param("userId") Integer userId);
 
-  @Query("select r from AIRecommendation r where r.userId = :userId and r.recommendedUserId = :recommendedUserId")
-  AIRecommendation getRecommendataionInfoByUserIdAndRecommendedUserId(
-      @Param("userId") Integer userId,
-      @Param("recommendedUserId") Integer recommendedUserId);
+  @Query("select r from AIRecommendation r where r.userId = :userId")
+  List<AIRecommendation> getRecommendationByUserId(@Param("userId") Integer userId);
 
+  @Query("select r from AIRecommendation r where r.recommendedUserId = :userId")
+  List<AIRecommendation> getRecommendationByRecommendedUserId(@Param("userId") Integer userId);
 }

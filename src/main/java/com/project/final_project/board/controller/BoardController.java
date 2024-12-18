@@ -30,6 +30,11 @@ public class BoardController {
     return boardService.registerBoard(dto);
   }
 
+  @GetMapping("/all-list/{userId}")
+  public List<BoardListResponseDTO> getAllBoards(@PathVariable("userId") Integer userId) {
+    return boardService.getAllBoards(userId);
+  }
+
   @GetMapping("/list/{userId}")
   public List<BoardListResponseDTO> getBoardListByUserId(@PathVariable("userId") Integer userId) {
     return boardService.getBoardListByUserId(userId);
